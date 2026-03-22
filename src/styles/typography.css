@@ -19,13 +19,13 @@
 }
 
 /*
-  Dotted/stencil text treatment — simulates the Sélavy-inspired
-  perforated letterforms from the reference site. Uses a radial-gradient
-  dot matrix clipped to the text shape.
+  Dotted/stencil text — Sélavy-inspired perforated letterforms.
+  Larger dots (1.6px) in a tighter grid (4.5px) for a crisper pattern
+  that doesn't look "cropped" at character edges.
 */
 .text-dotted {
-  background-image: radial-gradient(circle, currentColor 1.2px, transparent 1.2px);
-  background-size: 5px 5px;
+  background-image: radial-gradient(circle, currentColor 1.6px, transparent 1.6px);
+  background-size: 4.5px 4.5px;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -33,7 +33,7 @@
 }
 
 .text-dotted-fine {
-  background-image: radial-gradient(circle, currentColor 0.8px, transparent 0.8px);
+  background-image: radial-gradient(circle, currentColor 0.9px, transparent 0.9px);
   background-size: 3.5px 3.5px;
   -webkit-background-clip: text;
   background-clip: text;
@@ -41,10 +41,11 @@
   color: transparent;
 }
 
-/* Index artist: solid Wada default → dotted near-black on hover/focus */
+/* Index artist link: dotted Wada default → solid Wada on hover/focus */
 .indexArtistLink {
-  /* Slightly looser than base .font-display so wrapped names don’t collide */
-  line-height: 1.03;
+  display: inline;
+  line-height: 1.08;
+  padding-block: 0.04em;
   transition:
     color var(--duration-hover) ease-out,
     -webkit-text-fill-color var(--duration-hover) ease-out,

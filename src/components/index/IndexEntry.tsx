@@ -32,18 +32,16 @@ export default function IndexEntry({
   }, []);
 
   const wadaColor = getWadaColor(hoverColorIndex);
-  const showDotted = focused || (fineHover && hovered);
+  const active = focused || (fineHover && hovered);
 
   return (
     <Link
       href={`/entry/${id}`}
       className={`font-display no-underline indexArtistLink ${
-        showDotted ? "text-dotted" : ""
+        active ? "" : "text-dotted"
       }`}
       title={artistName}
-      style={{
-        color: showDotted ? "var(--color-text)" : wadaColor,
-      }}
+      style={{ color: wadaColor }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onFocus={() => setFocused(true)}

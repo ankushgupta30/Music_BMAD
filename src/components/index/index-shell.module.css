@@ -62,13 +62,13 @@
   min-height: 0;
   width: 100%;
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   overflow-x: auto;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
-  padding-top: clamp(0.5rem, 1.5vh, 1.25rem);
-  padding-bottom: clamp(0.65rem, 2vh, 1.5rem);
+  padding-top: clamp(0.35rem, 1vh, 0.75rem);
+  padding-bottom: clamp(0.35rem, 1vh, 0.75rem);
   padding-left: max(var(--margin-index-inline), env(safe-area-inset-left, 0px));
   padding-right: max(var(--margin-index-inline), env(safe-area-inset-right, 0px));
   line-height: 1.08;
