@@ -35,7 +35,10 @@ function AuthCallbackNoticeInner() {
       const errorCode = params.get("error_code");
       const errorDesc = params.get("error_description");
 
-      if (errorCode === "over_email_send_rate_limit") {
+      if (errorCode === "provider_email_needs_verification") {
+        hashMessage =
+          "Spotify’s email on your account isn’t verified yet. Supabase sent a confirmation link to that same email — open your inbox (and spam), click the link, then try “Connect with Spotify” again. Also check spotify.com/account: confirm your email there if Spotify still shows it as unverified.";
+      } else if (errorCode === "over_email_send_rate_limit") {
         hashMessage =
           "Supabase temporarily blocked sign-in (email rate limit). Wait about 1 minute, then try “Connect with Spotify” again. If this keeps happening: Supabase → Authentication → Providers → Email → disable “Confirm email” for testing, or wait longer between attempts.";
       } else if (errorCode || params.get("error")) {
