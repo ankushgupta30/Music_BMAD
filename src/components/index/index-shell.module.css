@@ -56,6 +56,13 @@
   background: var(--color-bg);
 }
 
+/* Fixed gap after the sidebar border before index / detail content */
+@media (min-width: 640px) {
+  .main {
+    margin-left: var(--margin-after-rail);
+  }
+}
+
 /* Horizontal scroll viewport for index tapestry (child supplies width: max-content column) */
 .indexScroll {
   flex: 1;
@@ -130,5 +137,10 @@
   .logo {
     writing-mode: horizontal-tb;
     transform: none;
+  }
+
+  .main {
+    margin-left: 0;
+    margin-top: var(--margin-after-rail);
   }
 }

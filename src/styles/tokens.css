@@ -47,6 +47,8 @@
   --gap-tapestry-inline: clamp(1.25rem, 2.5vw, 2.5rem);
   /* Sidebar natural width for panel positioning */
   --sidebar-width: 4rem;
+  /* Space between Rewind rail divider and main tapestry (desktop: left of main; mobile: below rail) */
+  --margin-after-rail: 50px;
 
   /* Motion */
   --duration-hover: 200ms;
