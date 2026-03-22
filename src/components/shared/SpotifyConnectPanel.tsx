@@ -8,6 +8,7 @@ import styles from "./spotify-connect-panel.module.css";
 interface SpotifyConnectPanelProps {
   open: boolean;
   onClose: () => void;
+  onSignOut?: () => void;
   connected?: boolean;
   layout?: "dock" | "modal";
 }
@@ -15,6 +16,7 @@ interface SpotifyConnectPanelProps {
 export default function SpotifyConnectPanel({
   open,
   onClose,
+  onSignOut,
   connected,
   layout = "modal",
 }: SpotifyConnectPanelProps) {
@@ -63,6 +65,21 @@ export default function SpotifyConnectPanel({
       setBusy(false);
     }
   }, []);
+
+  const signOut = useCallback(async () => {
+    if (!isSupabaseConfigured) return;
+    setError(null);
+    setBusy(true);
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+      onSignOut?.();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Sign out failed.");
+    } finally {
+      setBusy(false);
+    }
+  }, [onSignOut]);
 
   const syncLiked = useCallback(async () => {
     setError(null);
@@ -145,6 +162,16 @@ export default function SpotifyConnectPanel({
             disabled={busy || !isSupabaseConfigured}
           >
             {busy ? "Opening…" : "Connect with Spotify"}
+          </button>
+        )}
+        {connected && (
+          <button
+            type="button"
+            className={styles.closeBtn}
+            onClick={signOut}
+            disabled={busy}
+          >
+            Sign out
           </button>
         )}
         <button type="button" className={styles.closeBtn} onClick={onClose}>

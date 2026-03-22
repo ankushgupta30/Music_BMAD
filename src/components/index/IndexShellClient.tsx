@@ -69,6 +69,10 @@ export default function IndexShellClient({
               layout="dock"
               open
               onClose={() => setPanelOpen(false)}
+              onSignOut={() => {
+                setConnected(false);
+                setPanelOpen(false);
+              }}
               connected={connected}
             />
           ) : null}
