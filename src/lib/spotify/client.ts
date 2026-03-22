@@ -50,12 +50,12 @@ export interface SpotifyAlbumResult {
 export async function searchSpotify(
   query: string,
   type: "album" | "track" | "artist" = "album",
-  limit: number = 12
+  limit: number = 10
 ): Promise<SpotifyAlbumResult[]> {
   const token = await getClientCredentialsToken();
 
-  const n = typeof limit === "number" && Number.isFinite(limit) ? limit : 12;
-  const safeLimit = Math.min(50, Math.max(1, Math.floor(Math.abs(n))));
+  const n = typeof limit === "number" && Number.isFinite(limit) ? limit : 10;
+  const safeLimit = Math.min(10, Math.max(1, Math.floor(Math.abs(n))));
   const params = new URLSearchParams({
     q: query.trim(),
     type,
@@ -68,7 +68,9 @@ export async function searchSpotify(
     params.set("market", market);
   }
 
-  const res = await fetch(`${SEARCH_ENDPOINT}?${params.toString()}`, {
+  const url = `${SEARCH_ENDPOINT}?${params.toString()}`;
+
+  const res = await fetch(url, {
     headers: {
       Authorization: `Bearer ${token}`,
       Accept: "application/json",
@@ -91,6 +93,7 @@ export async function searchSpotify(
     } catch {
       if (errText) detail = ` — ${errText.slice(0, 200)}`;
     }
+    console.error("[spotify] search failed", { url: url.replace(/Bearer\s\S+/, "Bearer ***"), status: res.status, detail, params: Object.fromEntries(params) });
     throw new Error(`Spotify search failed: ${res.status}${detail}`);
   }
 

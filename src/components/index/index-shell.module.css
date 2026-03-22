@@ -9,8 +9,7 @@
 .drawer {
   flex-shrink: 0;
   overflow: hidden;
-  background: #ffffff;
-  border-right: 1px solid var(--color-text-meta);
+  background: var(--color-bg);
   width: 0;
   transition: width var(--duration-panel, 250ms) var(--ease-out, ease-out);
 }

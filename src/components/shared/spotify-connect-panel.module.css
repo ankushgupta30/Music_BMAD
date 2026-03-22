@@ -12,7 +12,7 @@
   width: 100%;
   min-height: 100%;
   box-sizing: border-box;
-  background: #ffffff;
+  background: var(--color-bg);
   padding: clamp(1.25rem, 4vh, 2rem);
   display: flex;
   flex-direction: column;

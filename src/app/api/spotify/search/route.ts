@@ -38,10 +38,17 @@ export async function GET(request: Request) {
     );
   }
 
+  const limitParam = searchParams.get("limit");
+  const limit =
+    limitParam != null && /^\d+$/.test(limitParam)
+      ? Math.min(10, Math.max(1, parseInt(limitParam, 10)))
+      : 10;
+
   try {
-    const results = await searchSpotify(query.trim(), type, 20);
+    const results = await searchSpotify(query.trim(), type, limit);
     return NextResponse.json({ data: results });
   } catch (e) {
+    console.error("[api/spotify/search]", { query, type, limit, error: e instanceof Error ? e.message : e });
     return NextResponse.json(
       { error: e instanceof Error ? e.message : "Search failed." },
       { status: 502 }
