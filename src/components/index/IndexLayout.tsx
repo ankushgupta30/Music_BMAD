@@ -105,25 +105,35 @@ export default function IndexLayout({
   }, []);
 
   return (
-    <div ref={scrollRef} className={shellStyles.indexScroll}>
-      <div className={layoutStyles.tapestry}>
-        {rows.map((row, rowIndex) => (
-          <div
-            key={`tapestry-row-${rowIndex}`}
-            className={`${layoutStyles.tapestryRow} ${
-              rowIndex % 2 === 1 ? layoutStyles.tapestryRowStagger : ""
-            }`}
-          >
-            {repeatRowEntries(row, ROW_HORIZONTAL_COPIES).map((entry, segIndex) =>
-              renderEntryUnit(
-                entry,
-                `${entry.id}-r${rowIndex}-s${segIndex}`,
-                entryHrefBase
-              )
-            )}
-          </div>
-        ))}
+    <div className={shellStyles.indexScrollViewport}>
+      <div ref={scrollRef} className={shellStyles.indexScroll}>
+        <div className={layoutStyles.tapestry}>
+          {rows.map((row, rowIndex) => (
+            <div
+              key={`tapestry-row-${rowIndex}`}
+              className={`${layoutStyles.tapestryRow} ${
+                rowIndex % 2 === 1 ? layoutStyles.tapestryRowStagger : ""
+              }`}
+            >
+              {repeatRowEntries(row, ROW_HORIZONTAL_COPIES).map((entry, segIndex) =>
+                renderEntryUnit(
+                  entry,
+                  `${entry.id}-r${rowIndex}-s${segIndex}`,
+                  entryHrefBase
+                )
+              )}
+            </div>
+          ))}
+        </div>
       </div>
+      <span
+        className={shellStyles.indexScrollFadeLeft}
+        aria-hidden
+      />
+      <span
+        className={shellStyles.indexScrollFadeRight}
+        aria-hidden
+      />
     </div>
   );
 }

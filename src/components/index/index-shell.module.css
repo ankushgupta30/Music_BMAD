@@ -56,6 +56,16 @@
   background: var(--color-bg);
 }
 
+/* Wraps scroll + edge scrims (scrims stay fixed to viewport; tapestry scrolls inside) */
+.indexScrollViewport {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 /* Horizontal scroll viewport for index tapestry (child supplies width: max-content column) */
 .indexScroll {
   flex: 1;
@@ -88,6 +98,26 @@
     padding-left: max(0px, env(safe-area-inset-left, 0px));
     padding-right: max(var(--index-pane-inline), env(safe-area-inset-right, 0px));
   }
+}
+
+.indexScrollFadeLeft,
+.indexScrollFadeRight {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: var(--index-edge-fade-width);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.indexScrollFadeLeft {
+  left: 0;
+  background: linear-gradient(to right, var(--color-bg), transparent);
+}
+
+.indexScrollFadeRight {
+  right: 0;
+  background: linear-gradient(to left, var(--color-bg), transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {

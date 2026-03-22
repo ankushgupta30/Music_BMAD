@@ -54,6 +54,8 @@
   --margin-after-rail: 50px;
   /* Index pane gutters: right edge always; left+right on mobile. Desktop left gutter is only --margin-after-rail on .main. */
   --index-pane-inline: 50px;
+  /* Soft horizontal fade over tapestry at scroll viewport edges (softer than hard overflow clip) */
+  --index-edge-fade-width: clamp(1.25rem, 3.2vw, 2.25rem);
 
   /* Motion */
   --duration-hover: 200ms;
