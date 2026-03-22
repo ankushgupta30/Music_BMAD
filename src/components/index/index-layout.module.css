@@ -7,8 +7,6 @@
   gap: var(--tapestry-row-gap);
   width: max-content;
   box-sizing: border-box;
-  /* Breathing room after the last row when scrolling vertically */
-  padding-bottom: 0.15em;
 }
 
 .tapestryRow {
