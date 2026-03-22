@@ -54,14 +54,23 @@ export async function searchSpotify(
 ): Promise<SpotifyAlbumResult[]> {
   const token = await getClientCredentialsToken();
 
+  const safeLimit = Math.min(50, Math.max(1, limit));
   const params = new URLSearchParams({
-    q: query,
+    q: query.trim(),
     type,
-    limit: String(limit),
+    limit: String(safeLimit),
   });
+  // Client-credentials search: explicit market avoids some 400s / empty catalog quirks.
+  const market = (process.env.SPOTIFY_DEFAULT_MARKET || "US").trim();
+  if (market.toLowerCase() !== "from_token") {
+    params.set("market", market);
+  }
 
-  const res = await fetch(`${SEARCH_ENDPOINT}?${params}`, {
-    headers: { Authorization: `Bearer ${token}` },
+  const res = await fetch(`${SEARCH_ENDPOINT}?${params.toString()}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json",
+    },
   });
 
   if (!res.ok) {
@@ -69,7 +78,18 @@ export async function searchSpotify(
       cachedToken = null;
       throw new Error("Spotify token expired. Retry.");
     }
-    throw new Error(`Spotify search failed: ${res.status}`);
+    const errText = await res.text();
+    let detail = "";
+    try {
+      const errJson = JSON.parse(errText) as {
+        error?: { message?: string; reason?: string };
+      };
+      const msg = errJson?.error?.message ?? errJson?.error?.reason;
+      if (msg) detail = ` — ${msg}`;
+    } catch {
+      if (errText) detail = ` — ${errText.slice(0, 200)}`;
+    }
+    throw new Error(`Spotify search failed: ${res.status}${detail}`);
   }
 
   const data = await res.json();
