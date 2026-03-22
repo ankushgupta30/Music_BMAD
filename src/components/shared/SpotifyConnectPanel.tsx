@@ -9,7 +9,6 @@ interface SpotifyConnectPanelProps {
   open: boolean;
   onClose: () => void;
   connected?: boolean;
-  /** dock = in-flow drawer (pushes main). modal = fixed overlay + dim (legacy). */
   layout?: "dock" | "modal";
 }
 
@@ -21,6 +20,8 @@ export default function SpotifyConnectPanel({
 }: SpotifyConnectPanelProps) {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -48,6 +49,7 @@ export default function SpotifyConnectPanel({
         provider: "spotify",
         options: {
           redirectTo: `${origin}/auth/callback`,
+          scopes: "user-read-email user-library-read",
         },
       });
       if (oauthError) {
@@ -59,6 +61,27 @@ export default function SpotifyConnectPanel({
       );
     } finally {
       setBusy(false);
+    }
+  }, []);
+
+  const syncLiked = useCallback(async () => {
+    setError(null);
+    setSyncResult(null);
+    setSyncing(true);
+    try {
+      const res = await fetch("/api/spotify/sync-liked", { method: "POST" });
+      const json = await res.json();
+      if (!res.ok) {
+        setError(json.error ?? "Sync failed.");
+      } else {
+        setSyncResult(
+          `Synced ${json.albums ?? json.synced} albums from ${json.total} liked songs.`
+        );
+      }
+    } catch {
+      setError("Network error during sync.");
+    } finally {
+      setSyncing(false);
     }
   }, []);
 
@@ -82,6 +105,18 @@ export default function SpotifyConnectPanel({
         <>
           <h2 className={styles.heading}>Search</h2>
           <SearchPanel />
+
+          <div className={styles.syncSection}>
+            <button
+              type="button"
+              className={styles.syncBtn}
+              onClick={syncLiked}
+              disabled={syncing}
+            >
+              {syncing ? "Syncing…" : "Sync Liked Songs"}
+            </button>
+            {syncResult && <p className={styles.syncResult}>{syncResult}</p>}
+          </div>
         </>
       ) : (
         <>
