@@ -1,51 +1,76 @@
-/* Each entry is an atomic inline-block so artist + cover + meta stay together */
-.entryBlock {
-  display: inline-flex;
+/* Stacked horizontal bands inside scroll viewport */
+.tapestry {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  width: max-content;
+  box-sizing: border-box;
+}
+
+.tapestryRow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 0.1em;
-  vertical-align: middle;
-  margin-right: 0.15em;
-  margin-bottom: 0.35em;
-  /* Uniform artist size (matches reference wall) */
+  gap: var(--gap-tapestry-inline);
+  padding-inline-start: 0;
+}
+
+.tapestryRow.tapestryRowStagger {
+  padding-inline-start: var(--tapestry-stagger);
+}
+
+/* One entry: artist + cover/meta, packed; does not stretch to full viewport width */
+.entryUnit {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  flex-shrink: 0;
   font-size: var(--type-index);
+  padding-block: 0;
+  margin-inline-end: 0.15em;
+  scroll-snap-align: start;
+  line-height: 0.95;
+}
+
+.artistCell {
+  flex: 0 1 auto;
+  min-width: 0;
+  padding-right: 0.35em;
+  white-space: nowrap;
 }
 
 .coverMeta {
   display: inline-flex;
+  flex-direction: row;
   align-items: center;
+  flex-shrink: 0;
   gap: 0.12em;
+  padding-left: var(--cover-meta-pl);
 }
 
 .metaStack {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  line-height: 1.15;
+  line-height: 1.2;
   text-align: left;
-  max-width: 12em;
+  max-width: 14em;
 }
 
+/* Hierarchy: meta scales with display (em) but never below readable floor token */
 .metaSong {
   font-family: var(--font-meta), monospace;
-  font-size: var(--type-meta-index);
+  font-size: max(var(--type-meta-index), 0.185em);
   color: var(--color-text);
   font-weight: 400;
+  letter-spacing: 0.03em;
 }
 
 .metaYear {
   font-family: var(--font-meta), monospace;
-  font-size: calc(var(--type-meta-index) * 0.92);
+  font-size: max(calc(var(--type-meta-index) * 0.88), 0.165em);
   color: var(--color-text-meta);
-}
-
-/* Light bridge between entries (reference: dots between institutions) */
-.entrySep {
-  display: inline-block;
-  vertical-align: middle;
-  padding: 0 0.2em 0.35em;
-  font-family: var(--font-meta), monospace;
-  font-size: clamp(0.5rem, 1.2vw, 0.65rem);
-  color: var(--color-text-meta);
-  letter-spacing: 0.25em;
-  user-select: none;
+  letter-spacing: 0.04em;
 }

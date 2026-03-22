@@ -23,16 +23,29 @@
   --type-small: clamp(0.875rem, 2vw, 2.5rem);
   --type-meta: clamp(0.75rem, 0.9vw, 1rem);
 
-  /* Index wall — one size for all artist names (dense, editorial) */
-  --type-index: clamp(1rem, 2vw, 2.35rem);
-  --type-meta-index: clamp(0.45rem, 0.75vw, 0.65rem);
+  /* Index display: sized so ~10 rows fit in a 16" viewport (~900px usable height) */
+  --type-index: clamp(1.6rem, 3vw + 0.6vmin, 4.2rem);
+  /* Meta tracks index via em in layout; floor keeps tiny UI readable */
+  --type-meta-index: clamp(0.6rem, 0.4vw + 0.3rem, 0.95rem);
 
   /* Artwork */
   --scale-artwork-hover: 2.5;
+  /* Inline index thumbnail: +20% vs prior 0.85em */
+  --artwork-index-em: 1.02;
 
-  /* Spacing — use horizontal inset like reference */
+  /* Page chrome (detail, etc.); index stream uses edge-to-edge + own token */
   --margin-x: clamp(2rem, 9vw, 15rem);
+  /* Inset from sidebar / safe edge */
+  --margin-index-inline: clamp(1rem, 3.5vw, 2.75rem);
   --gap-entry: clamp(0.25rem, 1vw, 1.5rem);
+  /* Space between artist column and cover+meta cluster (~50px desktop) */
+  --cover-meta-pl: clamp(1rem, 3vw, 3.125rem);
+  /* Horizontal tapestry — no vertical band gap (continuous wall) */
+  --tapestry-row-gap: 0;
+  --tapestry-stagger: clamp(1.5rem, 5vw, 4rem);
+  --gap-tapestry-inline: clamp(1.25rem, 2.5vw, 2.5rem);
+  /* Sidebar natural width for panel positioning */
+  --sidebar-width: 4rem;
 
   /* Motion */
   --duration-hover: 200ms;
@@ -45,19 +58,21 @@
 /* Tablet (768px - 1023px) */
 @media (min-width: 768px) and (max-width: 1023px) {
   :root {
-    --type-index: clamp(0.95rem, 2.4vw, 2rem);
-    --type-meta-index: clamp(0.42rem, 0.9vw, 0.6rem);
+    --type-index: clamp(1.5rem, 3.5vw + 0.5vmin, 3.5rem);
+    --type-meta-index: clamp(0.55rem, 0.5vw + 0.25rem, 0.85rem);
     --margin-x: clamp(1.5rem, 7vw, 10rem);
+    --margin-index-inline: clamp(0.9rem, 3vw, 2.25rem);
   }
 }
 
 /* Mobile (<768px) */
 @media (max-width: 767px) {
   :root {
-    --type-index: clamp(0.9rem, 3.5vw, 1.35rem);
-    --type-meta-index: clamp(0.4rem, 2.8vw, 0.55rem);
+    --type-index: clamp(1.35rem, 5vw + 0.8vmin, 2.8rem);
+    --type-meta-index: clamp(0.5rem, 1.8vw + 0.2rem, 0.75rem);
     --type-meta: clamp(0.7rem, 2.5vw, 0.875rem);
     --margin-x: clamp(1rem, 5vw, 2.5rem);
+    --margin-index-inline: clamp(0.75rem, 4vw, 1.5rem);
   }
 }
 

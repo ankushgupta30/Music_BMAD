@@ -41,15 +41,18 @@
   color: transparent;
 }
 
-/*
-  Hover color transition for index entries.
-  The color property is set inline via JS; the transition is handled here.
-*/
-.text-hover-wada {
-  transition: color var(--duration-hover) ease-out,
-              -webkit-text-fill-color var(--duration-hover) ease-out;
+/* Index artist: solid Wada default → dotted near-black on hover/focus */
+.indexArtistLink {
+  /* Slightly looser than base .font-display so wrapped names don’t collide */
+  line-height: 1.03;
+  transition:
+    color var(--duration-hover) ease-out,
+    -webkit-text-fill-color var(--duration-hover) ease-out,
+    background-size var(--duration-hover) ease-out;
 }
 
-.text-hover-wada:hover {
-  -webkit-text-fill-color: currentColor;
+@media (prefers-reduced-motion: reduce) {
+  .indexArtistLink {
+    transition: none;
+  }
 }

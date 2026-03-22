@@ -1,4 +1,4 @@
-/* Left rail + main column (reference: editorial index UIs) */
+/* Left rail + main column */
 .shell {
   display: flex;
   min-height: 100vh;
@@ -30,25 +30,35 @@
 .main {
   flex: 1;
   min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Full-justified “long form” stream (Unlocked/Reconnected-style) */
-.justifyStream {
-  padding: clamp(1.25rem, 4vh, 3rem) var(--margin-x) clamp(2rem, 6vh, 4rem);
-  text-align: justify;
-  text-justify: inter-word;
-  hyphens: auto;
-  line-height: 1.12;
-  word-spacing: 0.02em;
-}
-
-/* Force last line to participate in justification (classic trick) */
-.justifyStream::after {
-  content: "";
-  display: inline-block;
+/* Horizontal scroll viewport for index tapestry (child supplies width: max-content column) */
+.indexScroll {
+  flex: 1;
+  min-height: 0;
   width: 100%;
-  height: 0;
-  vertical-align: bottom;
+  display: flex;
+  align-items: flex-start;
+  overflow-x: auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  padding-top: clamp(0.5rem, 1.5vh, 1.25rem);
+  padding-bottom: clamp(0.65rem, 2vh, 1.5rem);
+  padding-left: max(var(--margin-index-inline), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--margin-index-inline), env(safe-area-inset-right, 0px));
+  /* Slightly roomier for multi-line display names (child .font-display still controls most type) */
+  line-height: 1.08;
+  scroll-snap-type: x proximity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .indexScroll {
+    scroll-snap-type: none;
+  }
 }
 
 @media (max-width: 639px) {

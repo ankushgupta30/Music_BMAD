@@ -1,0 +1,85 @@
+.button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0;
+  border: 1.5px solid var(--color-text-meta);
+  border-radius: 9999px;
+  background: var(--color-bg);
+  cursor: pointer;
+  isolation: isolate;
+  transition:
+    border-color var(--duration-hover) var(--ease-out, ease-out),
+    transform var(--duration-hover) var(--ease-out, ease-out);
+}
+
+.button:hover {
+  border-color: #1db954;
+  transform: scale(1.06);
+}
+
+.button:focus-visible {
+  outline: 2px solid #1db954;
+  outline-offset: 3px;
+}
+
+/* Rotating dashed ring — subtle, fits site's perforated language */
+.ring {
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  pointer-events: none;
+  border: 1.5px dashed #1db954;
+  animation: spotifyRingSpin 12s linear infinite;
+  opacity: 0.55;
+}
+
+.button:hover .ring {
+  opacity: 0.9;
+  animation-duration: 4s;
+}
+
+.inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon {
+  display: block;
+  color: #1db954;
+}
+
+/* Future: connected state */
+.button[data-connected="true"] .ring {
+  animation: none;
+  border-style: solid;
+  opacity: 0.7;
+}
+
+.button[data-connected="true"] .icon {
+  color: #1db954;
+}
+
+@keyframes spotifyRingSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring {
+    animation: none;
+  }
+
+  .button:hover {
+    transform: none;
+  }
+}
