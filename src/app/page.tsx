@@ -1,3 +1,4 @@
+import AuthCallbackNotice from "@/components/shared/AuthCallbackNotice";
 import IndexLayout from "@/components/index/IndexLayout";
 import IndexShell from "@/components/index/IndexShell";
 import { SEED_ENTRIES } from "@/lib/utils/seedData";
@@ -37,8 +38,11 @@ export default async function Home() {
   const entries = await getEntries();
 
   return (
-    <IndexShell>
-      <IndexLayout entries={entries} />
-    </IndexShell>
+    <>
+      <AuthCallbackNotice />
+      <IndexShell>
+        <IndexLayout entries={entries} />
+      </IndexShell>
+    </>
   );
 }
