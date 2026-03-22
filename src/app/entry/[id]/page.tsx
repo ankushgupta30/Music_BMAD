@@ -95,6 +95,7 @@ export default async function EntryPage({ params }: EntryPageProps) {
         style={{
           fontSize: "var(--type-large)",
           color: "var(--color-text)",
+          ["--dotted-ink" as string]: "var(--color-text)",
         }}
       >
         {entry.artist_name}

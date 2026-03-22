@@ -44,7 +44,10 @@ export default function IndexEntry({
         active ? "" : "text-dotted"
       }`}
       title={artistName}
-      style={{ color: wadaColor }}
+      style={{
+        color: wadaColor,
+        ["--dotted-ink" as string]: wadaColor,
+      }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onFocus={() => setFocused(true)}

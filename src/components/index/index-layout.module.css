@@ -4,7 +4,7 @@
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
-  gap: 0;
+  gap: var(--tapestry-row-gap);
   width: max-content;
   box-sizing: border-box;
   /* Breathing room after the last row when scrolling vertically */
@@ -15,18 +15,20 @@
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  align-items: baseline;
+  align-items: center;
   gap: var(--gap-tapestry-inline);
   padding-inline-start: 0;
 }
 
-/* Stagger removed: alternating inset made the left margin look “wrong” row-to-row */
+.tapestryRow.tapestryRowStagger {
+  padding-inline-start: var(--tapestry-stagger);
+}
 
-/* One entry: artist + cover/meta, packed */
+/* One entry: artist + cover/meta — artist vertically centred to cluster; cover/meta bottom-aligned */
 .entryUnit {
   display: inline-flex;
   flex-direction: row;
-  align-items: baseline;
+  align-items: center;
   flex-shrink: 0;
   font-size: var(--type-index);
   padding-block: 0;
@@ -45,7 +47,7 @@
 .coverMeta {
   display: inline-flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-end;
   flex-shrink: 0;
   gap: 0.12em;
   padding-left: var(--cover-meta-pl);
@@ -54,7 +56,7 @@
 .metaStack {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-end;
   line-height: 1.2;
   text-align: left;
   max-width: 14em;

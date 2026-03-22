@@ -20,12 +20,19 @@
 
 /*
   Dotted/stencil text — Sélavy-inspired perforated letterforms.
-  Larger dots (1.6px) in a tighter grid (4.5px) for a crisper pattern
-  that doesn't look "cropped" at character edges.
+  Canonical spec from 2675b3f: 1.6px dots, 4.5px grid (fine: 0.9px / 3.5px).
+  Set --dotted-ink on the same element as .text-dotted (or inherit) so the
+  halftone stays visible even when color: transparent would break currentColor.
 */
 .text-dotted {
-  background-image: radial-gradient(circle, currentColor 1.6px, transparent 1.6px);
+  background-image: radial-gradient(
+    circle,
+    var(--dotted-ink, currentColor) 1.6px,
+    transparent 1.6px
+  );
   background-size: 4.5px 4.5px;
+  background-position: 0 0;
+  background-repeat: repeat;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -33,8 +40,14 @@
 }
 
 .text-dotted-fine {
-  background-image: radial-gradient(circle, currentColor 0.9px, transparent 0.9px);
+  background-image: radial-gradient(
+    circle,
+    var(--dotted-ink, currentColor) 0.9px,
+    transparent 0.9px
+  );
   background-size: 3.5px 3.5px;
+  background-position: 0 0;
+  background-repeat: repeat;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;

@@ -84,6 +84,7 @@ export default async function SharedEntryPage({ params }: Props) {
         style={{
           fontSize: "var(--type-large)",
           color: "var(--color-text)",
+          ["--dotted-ink" as string]: "var(--color-text)",
         }}
       >
         {entry.artist_name}
