@@ -4,7 +4,7 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-text-meta);
-  padding: clamp(0.35rem, 1vh, 0.6rem)
+  padding: var(--index-scroll-pad-block)
     max(var(--margin-index-inline), env(safe-area-inset-right, 0px))
     0
     max(var(--margin-index-inline), env(safe-area-inset-left, 0px));
