@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { displayFont, metaFont, handFont } from "@/styles/fonts";
+import RouteAnnouncer from "@/components/shared/RouteAnnouncer";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -12,8 +14,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className="min-h-full">{children}</body>
+    <html
+      lang="en"
+      className={`${displayFont.variable} ${metaFont.variable} ${handFont.variable} h-full antialiased`}
+    >
+      <body className="min-h-full">
+        <RouteAnnouncer />
+        {children}
+      </body>
     </html>
   );
 }

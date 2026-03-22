@@ -5,6 +5,10 @@ export interface Entry {
   spotify_id: string;
   artist_name: string;
   album_name: string;
+  /** Track or piece title shown beside the cover (line 1) */
+  song_name: string;
+  /** Release year shown under the song title (line 2) */
+  release_year: number;
   artwork_url: string;
   note_text: string | null;
   scale_tier: ScaleTier;

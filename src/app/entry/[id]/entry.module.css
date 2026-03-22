@@ -1,0 +1,9 @@
+.backLink {
+  font-size: var(--type-meta);
+  color: var(--color-text-meta);
+  transition: color var(--duration-hover) ease-out;
+}
+
+.backLink:hover {
+  color: var(--color-text);
+}

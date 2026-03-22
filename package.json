@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "parse-songs": "node scripts/parse-songs-raw.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.9.0",

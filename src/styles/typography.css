@@ -1,45 +1,55 @@
-/*
-  Display font — dotted/stencil letterforms.
-  Replace with actual font files once sourced.
-  Using a fallback approach: system font until custom font is loaded.
-*/
-@font-face {
-  font-family: 'RewindDisplay';
-  src: url('/fonts/selavy-dotted.woff2') format('woff2'),
-       url('/fonts/selavy-dotted.woff') format('woff');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-/*
-  Handwritten font for journal notes and postcards.
-  Using Google Font "Caveat" as the initial choice.
-*/
-@font-face {
-  font-family: 'RewindHand';
-  src: url('/fonts/caveat.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
 .font-display {
-  font-family: 'RewindDisplay', 'Arial Black', 'Helvetica Neue', sans-serif;
-  font-weight: 400;
+  font-family: var(--font-display), 'Arial Black', 'Helvetica Neue', sans-serif;
+  font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 0.95;
 }
 
 .font-meta {
-  font-family: 'SuisseIntlMono', 'SF Mono', 'Fira Code', 'Fira Mono', monospace;
+  font-family: var(--font-meta), 'SF Mono', 'Fira Code', monospace;
   font-weight: 400;
   letter-spacing: 0.02em;
   line-height: 1.4;
 }
 
 .font-hand {
-  font-family: 'RewindHand', 'Caveat', 'Segoe Script', cursive;
+  font-family: var(--font-hand), 'Segoe Script', cursive;
   font-weight: 400;
   line-height: 1.6;
+}
+
+/*
+  Dotted/stencil text treatment — simulates the Sélavy-inspired
+  perforated letterforms from the reference site. Uses a radial-gradient
+  dot matrix clipped to the text shape.
+*/
+.text-dotted {
+  background-image: radial-gradient(circle, currentColor 1.2px, transparent 1.2px);
+  background-size: 5px 5px;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.text-dotted-fine {
+  background-image: radial-gradient(circle, currentColor 0.8px, transparent 0.8px);
+  background-size: 3.5px 3.5px;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/*
+  Hover color transition for index entries.
+  The color property is set inline via JS; the transition is handled here.
+*/
+.text-hover-wada {
+  transition: color var(--duration-hover) ease-out,
+              -webkit-text-fill-color var(--duration-hover) ease-out;
+}
+
+.text-hover-wada:hover {
+  -webkit-text-fill-color: currentColor;
 }

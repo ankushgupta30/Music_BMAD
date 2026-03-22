@@ -1,12 +1,11 @@
+import IndexLayout from "@/components/index/IndexLayout";
+import IndexShell from "@/components/index/IndexShell";
+import { SEED_ENTRIES } from "@/lib/utils/seedData";
+
 export default function Home() {
   return (
-    <main
-      className="min-h-screen"
-      style={{ padding: "var(--margin-x)" }}
-    >
-      <p className="font-display" style={{ fontSize: "var(--type-large)" }}>
-        Rewind
-      </p>
-    </main>
+    <IndexShell>
+      <IndexLayout entries={SEED_ENTRIES} />
+    </IndexShell>
   );
 }

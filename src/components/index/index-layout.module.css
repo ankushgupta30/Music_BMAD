@@ -1,0 +1,51 @@
+/* Each entry is an atomic inline-block so artist + cover + meta stay together */
+.entryBlock {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1em;
+  vertical-align: middle;
+  margin-right: 0.15em;
+  margin-bottom: 0.35em;
+  /* Uniform artist size (matches reference wall) */
+  font-size: var(--type-index);
+}
+
+.coverMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.12em;
+}
+
+.metaStack {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1.15;
+  text-align: left;
+  max-width: 12em;
+}
+
+.metaSong {
+  font-family: var(--font-meta), monospace;
+  font-size: var(--type-meta-index);
+  color: var(--color-text);
+  font-weight: 400;
+}
+
+.metaYear {
+  font-family: var(--font-meta), monospace;
+  font-size: calc(var(--type-meta-index) * 0.92);
+  color: var(--color-text-meta);
+}
+
+/* Light bridge between entries (reference: dots between institutions) */
+.entrySep {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 0 0.2em 0.35em;
+  font-family: var(--font-meta), monospace;
+  font-size: clamp(0.5rem, 1.2vw, 0.65rem);
+  color: var(--color-text-meta);
+  letter-spacing: 0.25em;
+  user-select: none;
+}
