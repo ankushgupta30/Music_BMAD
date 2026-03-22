@@ -1,0 +1,45 @@
+/*
+  Display font — dotted/stencil letterforms.
+  Replace with actual font files once sourced.
+  Using a fallback approach: system font until custom font is loaded.
+*/
+@font-face {
+  font-family: 'RewindDisplay';
+  src: url('/fonts/selavy-dotted.woff2') format('woff2'),
+       url('/fonts/selavy-dotted.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*
+  Handwritten font for journal notes and postcards.
+  Using Google Font "Caveat" as the initial choice.
+*/
+@font-face {
+  font-family: 'RewindHand';
+  src: url('/fonts/caveat.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-display {
+  font-family: 'RewindDisplay', 'Arial Black', 'Helvetica Neue', sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+}
+
+.font-meta {
+  font-family: 'SuisseIntlMono', 'SF Mono', 'Fira Code', 'Fira Mono', monospace;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+}
+
+.font-hand {
+  font-family: 'RewindHand', 'Caveat', 'Segoe Script', cursive;
+  font-weight: 400;
+  line-height: 1.6;
+}

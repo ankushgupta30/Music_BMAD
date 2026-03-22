@@ -1,0 +1,23 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+@import "../styles/typography.css";
+
+@theme inline {
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-text);
+}
+
+html {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+body {
+  background: var(--color-bg);
+  min-height: 100vh;
+}
+
+::selection {
+  background: var(--color-wada-5);
+  color: var(--color-bg);
+}

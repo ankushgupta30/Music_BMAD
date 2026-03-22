@@ -1,0 +1,44 @@
+:root {
+  /* Background */
+  --color-bg: #F5F3EF;
+  --color-bg-dim: rgba(0, 0, 0, 0.04);
+
+  /* Text */
+  --color-text: #1A1A1A;
+  --color-text-meta: #8A8A8A;
+
+  /* Sanzo Wada palette — hover states */
+  --color-wada-1: #C65D52; /* Muted terracotta */
+  --color-wada-2: #6B7F5E; /* Moss green */
+  --color-wada-3: #5B7A8A; /* Slate blue */
+  --color-wada-4: #D4764E; /* Soft vermillion */
+  --color-wada-5: #C4A24E; /* Ochre */
+  --color-wada-6: #2E6E6E; /* Deep teal */
+  --color-wada-7: #B8706E; /* Dusty rose */
+  --color-wada-8: #7A9A7A; /* Sage */
+
+  /* Type scale — desktop */
+  --type-large: clamp(3rem, 8vw, 10rem);
+  --type-medium: clamp(1.5rem, 4vw, 5rem);
+  --type-small: clamp(0.875rem, 2vw, 2.5rem);
+  --type-meta: clamp(0.75rem, 0.9vw, 1rem);
+
+  /* Spacing */
+  --margin-x: clamp(1.5rem, 6vw, 8vw);
+
+  /* Motion */
+  --duration-hover: 200ms;
+  --duration-zoom: 300ms;
+  --duration-transition: 450ms;
+  --duration-panel: 250ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (max-width: 767px) {
+  :root {
+    --type-large: clamp(3rem, 15vw, 18vw);
+    --type-medium: clamp(1.75rem, 10vw, 12vw);
+    --type-small: clamp(1rem, 6vw, 7vw);
+    --margin-x: 4vw;
+  }
+}
