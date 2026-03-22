@@ -81,15 +81,23 @@ export default function SpotifyConnectPanel({
     }
   }, [onSignOut]);
 
+  const [needsReauth, setNeedsReauth] = useState(false);
+
   const syncLiked = useCallback(async () => {
     setError(null);
     setSyncResult(null);
+    setNeedsReauth(false);
     setSyncing(true);
     try {
       const res = await fetch("/api/spotify/sync-liked", { method: "POST" });
       const json = await res.json();
       if (!res.ok) {
-        setError(json.error ?? "Sync failed.");
+        if (json.error === "SCOPE_MISSING") {
+          setNeedsReauth(true);
+          setError(json.message);
+        } else {
+          setError(json.error ?? "Sync failed.");
+        }
       } else {
         setSyncResult(
           `Synced ${json.albums ?? json.synced} albums from ${json.total} liked songs.`
@@ -133,6 +141,18 @@ export default function SpotifyConnectPanel({
               {syncing ? "Syncing…" : "Sync Liked Songs"}
             </button>
             {syncResult && <p className={styles.syncResult}>{syncResult}</p>}
+            {needsReauth && (
+              <button
+                type="button"
+                className={styles.connectBtn}
+                onClick={async () => {
+                  await signOut();
+                  connect();
+                }}
+              >
+                Sign out &amp; reconnect
+              </button>
+            )}
           </div>
         </>
       ) : (

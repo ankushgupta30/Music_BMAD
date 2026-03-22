@@ -60,6 +60,11 @@ async function fetchAllLikedTracks(
 
     if (!res.ok) {
       const body = await res.text().catch(() => "");
+      if (res.status === 403) {
+        throw new Error(
+          "SCOPE_MISSING"
+        );
+      }
       throw new Error(
         `Spotify /me/tracks failed: ${res.status} — ${body.slice(0, 200)}`
       );
@@ -145,10 +150,18 @@ export async function POST() {
       albums: entries.length,
     });
   } catch (e) {
+    const msg = e instanceof Error ? e.message : "Sync failed.";
+    if (msg === "SCOPE_MISSING") {
+      return NextResponse.json(
+        {
+          error: "SCOPE_MISSING",
+          message:
+            "Spotify library permission missing. Sign out, then sign back in to grant access.",
+        },
+        { status: 403 }
+      );
+    }
     console.error("[sync-liked]", e);
-    return NextResponse.json(
-      { error: e instanceof Error ? e.message : "Sync failed." },
-      { status: 502 }
-    );
+    return NextResponse.json({ error: msg }, { status: 502 });
   }
 }
