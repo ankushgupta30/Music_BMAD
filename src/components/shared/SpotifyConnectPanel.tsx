@@ -9,12 +9,15 @@ interface SpotifyConnectPanelProps {
   open: boolean;
   onClose: () => void;
   connected?: boolean;
+  /** dock = in-flow drawer (pushes main). modal = fixed overlay + dim (legacy). */
+  layout?: "dock" | "modal";
 }
 
 export default function SpotifyConnectPanel({
   open,
   onClose,
   connected,
+  layout = "modal",
 }: SpotifyConnectPanelProps) {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -61,6 +64,65 @@ export default function SpotifyConnectPanel({
 
   if (!open) return null;
 
+  const panelClass =
+    layout === "dock" ? styles.panelDock : styles.panel;
+
+  const inner = (
+    <div
+      className={panelClass}
+      role="dialog"
+      aria-modal={layout === "modal"}
+      aria-labelledby="spotify-panel-title"
+    >
+      <p className={styles.title} id="spotify-panel-title">
+        Spotify
+      </p>
+
+      {connected ? (
+        <>
+          <h2 className={styles.heading}>Search</h2>
+          <SearchPanel />
+        </>
+      ) : (
+        <>
+          <h2 className={styles.heading}>Connect your account</h2>
+          <p className={styles.body}>
+            Sign in with Spotify to search and add albums to your Rewind
+            journal.
+          </p>
+          {!isSupabaseConfigured && (
+            <p className={styles.error}>
+              Supabase is not configured. Set environment variables to enable
+              authentication.
+            </p>
+          )}
+        </>
+      )}
+
+      {error && <p className={styles.error}>{error}</p>}
+
+      <div className={styles.actions}>
+        {!connected && (
+          <button
+            type="button"
+            className={styles.connectBtn}
+            onClick={connect}
+            disabled={busy || !isSupabaseConfigured}
+          >
+            {busy ? "Opening…" : "Connect with Spotify"}
+          </button>
+        )}
+        <button type="button" className={styles.closeBtn} onClick={onClose}>
+          Close
+        </button>
+      </div>
+    </div>
+  );
+
+  if (layout === "dock") {
+    return inner;
+  }
+
   return (
     <>
       <button
@@ -69,55 +131,7 @@ export default function SpotifyConnectPanel({
         aria-label="Close panel"
         onClick={onClose}
       />
-      <div
-        className={styles.panel}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="spotify-panel-title"
-      >
-        <p className={styles.title} id="spotify-panel-title">
-          Spotify
-        </p>
-
-        {connected ? (
-          <>
-            <h2 className={styles.heading}>Search</h2>
-            <SearchPanel />
-          </>
-        ) : (
-          <>
-            <h2 className={styles.heading}>Connect your account</h2>
-            <p className={styles.body}>
-              Sign in with Spotify to search and add albums to your Rewind
-              journal.
-            </p>
-            {!isSupabaseConfigured && (
-              <p className={styles.error}>
-                Supabase is not configured. Set environment variables to enable
-                authentication.
-              </p>
-            )}
-          </>
-        )}
-
-        {error && <p className={styles.error}>{error}</p>}
-
-        <div className={styles.actions}>
-          {!connected && (
-            <button
-              type="button"
-              className={styles.connectBtn}
-              onClick={connect}
-              disabled={busy || !isSupabaseConfigured}
-            >
-              {busy ? "Opening…" : "Connect with Spotify"}
-            </button>
-          )}
-          <button type="button" className={styles.closeBtn} onClick={onClose}>
-            Close
-          </button>
-        </div>
-      </div>
+      {inner}
     </>
   );
 }

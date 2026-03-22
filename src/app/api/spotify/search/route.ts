@@ -39,7 +39,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const results = await searchSpotify(query.trim(), type);
+    const results = await searchSpotify(query.trim(), type, 20);
     return NextResponse.json({ data: results });
   } catch (e) {
     return NextResponse.json(

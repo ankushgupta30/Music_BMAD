@@ -6,7 +6,20 @@
   animation: fadeIn var(--duration-panel, 250ms) var(--ease-out, ease-out);
 }
 
-/* Slides in from the left, adjacent to the sidebar */
+/* In-flow drawer: solid white, no overlay — parent column grows and pushes main */
+.panelDock {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+  background: #ffffff;
+  padding: clamp(1.25rem, 4vh, 2rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Legacy: fixed panel next to sidebar */
 .panel {
   position: fixed;
   top: 0;
@@ -144,3 +157,5 @@
     transform: none;
   }
 }
+
+/* panelDock: no slide animation — shell handles width */

@@ -2,15 +2,19 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { isSupabaseConfigured, createClient } from "@/lib/supabase/client";
-import SpotifyIcon from "./SpotifyIcon";
-import SpotifyConnectPanel from "./SpotifyConnectPanel";
+import SpotifyConnectPanel from "@/components/shared/SpotifyConnectPanel";
+import SpotifyIcon from "@/components/shared/SpotifyIcon";
+import styles from "./index-shell.module.css";
 
-/** Any Supabase session counts as “connected” — Rewind only uses Spotify OAuth today. */
 function hasSessionUser(user: { id?: string } | null | undefined): boolean {
   return !!user?.id;
 }
 
-export default function SpotifySidebarSlot() {
+export default function IndexShellClient({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [panelOpen, setPanelOpen] = useState(false);
   const [connected, setConnected] = useState(false);
 
@@ -42,25 +46,45 @@ export default function SpotifySidebarSlot() {
       });
       subscription = data.subscription;
     } catch {
-      // ignore
+      /* ignore */
     }
 
     return () => subscription?.unsubscribe();
   }, [syncSession]);
 
-  // After OAuth redirect, session is on the client — refresh when panel opens
   useEffect(() => {
     if (panelOpen) void syncSession();
   }, [panelOpen, syncSession]);
 
   return (
-    <>
-      <SpotifyIcon onClick={() => setPanelOpen(true)} connected={connected} />
-      <SpotifyConnectPanel
-        open={panelOpen}
-        onClose={() => setPanelOpen(false)}
-        connected={connected}
-      />
-    </>
+    <div className={styles.shell}>
+      <aside
+        className={`${styles.drawer} ${panelOpen ? styles.drawerOpen : ""}`}
+        aria-hidden={!panelOpen}
+        id="rewind-spotify-drawer"
+      >
+        <div className={styles.drawerInner}>
+          {panelOpen ? (
+            <SpotifyConnectPanel
+              layout="dock"
+              open
+              onClose={() => setPanelOpen(false)}
+              connected={connected}
+            />
+          ) : null}
+        </div>
+      </aside>
+
+      <aside className={styles.sidebar} aria-label="Site">
+        <span className={styles.logo}>Rewind</span>
+        <SpotifyIcon
+          onClick={() => setPanelOpen((o) => !o)}
+          connected={connected}
+          aria-expanded={panelOpen}
+        />
+      </aside>
+
+      <div className={styles.main}>{children}</div>
+    </div>
   );
 }

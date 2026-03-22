@@ -5,15 +5,22 @@ import styles from "./spotify-icon.module.css";
 interface SpotifyIconProps {
   onClick?: () => void;
   connected?: boolean;
+  "aria-expanded"?: boolean;
 }
 
-export default function SpotifyIcon({ onClick, connected }: SpotifyIconProps) {
+export default function SpotifyIcon({
+  onClick,
+  connected,
+  "aria-expanded": ariaExpanded,
+}: SpotifyIconProps) {
   return (
     <button
       type="button"
       className={styles.button}
-      aria-label={connected ? "Spotify connected" : "Connect Spotify"}
-      title={connected ? "Spotify connected" : "Connect Spotify"}
+      aria-label={connected ? "Spotify connected" : "Open Spotify panel"}
+      title={connected ? "Spotify connected" : "Open Spotify panel"}
+      aria-expanded={ariaExpanded}
+      aria-controls="rewind-spotify-drawer"
       onClick={onClick}
       data-connected={connected ? "true" : undefined}
     >

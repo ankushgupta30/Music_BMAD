@@ -50,15 +50,17 @@ export interface SpotifyAlbumResult {
 export async function searchSpotify(
   query: string,
   type: "album" | "track" | "artist" = "album",
-  limit = 12
+  limit: number = 12
 ): Promise<SpotifyAlbumResult[]> {
   const token = await getClientCredentialsToken();
 
-  const safeLimit = Math.min(50, Math.max(1, limit));
+  const n = typeof limit === "number" && Number.isFinite(limit) ? limit : 12;
+  const safeLimit = Math.min(50, Math.max(1, Math.floor(Math.abs(n))));
   const params = new URLSearchParams({
     q: query.trim(),
     type,
-    limit: String(safeLimit),
+    limit: `${safeLimit}`,
+    offset: "0",
   });
   // Client-credentials search: explicit market avoids some 400s / empty catalog quirks.
   const market = (process.env.SPOTIFY_DEFAULT_MARKET || "US").trim();
