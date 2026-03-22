@@ -35,7 +35,7 @@
 
   /* Page chrome (detail, etc.); index stream uses edge-to-edge + own token */
   --margin-x: clamp(2rem, 9vw, 15rem);
-  /* Inset from sidebar / safe edge — strong left gutter (≈56–104px) */
+  /* Legacy large horizontal inset; index scroll now uses --index-pane-inline + rail margin */
   --margin-index-inline: clamp(3rem, 6vw + 2rem, 6.5rem);
   /* Index scroll viewport: equal top/bottom gutter (right pane breathing room) */
   --index-scroll-pad-block: clamp(0.85rem, 2.2vh, 1.35rem);
@@ -50,8 +50,10 @@
   --gap-tapestry-inline: clamp(1.25rem, 2.5vw, 2.5rem);
   /* Sidebar natural width for panel positioning */
   --sidebar-width: 4rem;
-  /* Space between Rewind rail divider and main tapestry (desktop: left of main; mobile: below rail) */
+  /* Space between Rewind rail divider and .main edge (desktop only). Do not duplicate inside .indexScroll padding-left — that breaks scroll clip at the divider. */
   --margin-after-rail: 50px;
+  /* Index pane gutters: right edge always; left+right on mobile. Desktop left gutter is only --margin-after-rail on .main. */
+  --index-pane-inline: 50px;
 
   /* Motion */
   --duration-hover: 200ms;

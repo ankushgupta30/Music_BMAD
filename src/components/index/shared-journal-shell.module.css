@@ -4,10 +4,18 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-text-meta);
-  padding: var(--index-scroll-pad-block)
-    max(var(--margin-index-inline), env(safe-area-inset-right, 0px))
-    0
-    max(var(--margin-index-inline), env(safe-area-inset-left, 0px));
   margin: 0;
   flex-shrink: 0;
+  padding-top: var(--index-scroll-pad-block);
+  padding-bottom: 0;
+  /* Match .indexScroll horizontal gutters */
+  padding-left: max(var(--index-pane-inline), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--index-pane-inline), env(safe-area-inset-right, 0px));
+}
+
+@media (min-width: 640px) {
+  .banner {
+    padding-left: max(0px, env(safe-area-inset-left, 0px));
+    padding-right: max(var(--index-pane-inline), env(safe-area-inset-right, 0px));
+  }
 }
