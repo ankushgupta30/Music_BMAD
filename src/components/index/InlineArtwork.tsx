@@ -10,6 +10,7 @@ interface InlineArtworkProps {
   entryId: string;
   artworkUrl: string;
   albumName: string;
+  entryHrefBase?: string;
 }
 
 const hoverSpring = { type: "spring" as const, stiffness: 420, damping: 24 };
@@ -19,6 +20,7 @@ export default function InlineArtwork({
   entryId,
   artworkUrl,
   albumName,
+  entryHrefBase = "/entry",
 }: InlineArtworkProps) {
   const reduceMotion = useReducedMotion();
   const linkRef = useRef<HTMLAnchorElement>(null);
@@ -50,7 +52,7 @@ export default function InlineArtwork({
   if (reduceMotion) {
     return (
       <Link
-        href={`/entry/${entryId}`}
+        href={`${entryHrefBase}/${entryId}`}
         ref={linkRef}
         className={`${styles.artLink} no-underline`}
         aria-label={label}
@@ -67,7 +69,7 @@ export default function InlineArtwork({
 
   return (
     <Link
-      href={`/entry/${entryId}`}
+      href={`${entryHrefBase}/${entryId}`}
       ref={linkRef}
       className={`${styles.artLink} no-underline`}
       onMouseMove={onMouseMove}

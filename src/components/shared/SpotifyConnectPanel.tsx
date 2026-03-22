@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { isSupabaseConfigured, createClient } from "@/lib/supabase/client";
 import SearchPanel from "@/components/search/SearchPanel";
+import JournalShareSection from "@/components/shared/JournalShareSection";
 import styles from "./spotify-connect-panel.module.css";
 
 interface SpotifyConnectPanelProps {
@@ -154,6 +155,8 @@ export default function SpotifyConnectPanel({
               </button>
             )}
           </div>
+
+          <JournalShareSection />
         </>
       ) : (
         <>

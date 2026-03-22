@@ -1,0 +1,116 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--color-text-meta);
+}
+
+.label {
+  font-family: var(--font-meta), monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-meta);
+  margin: 0;
+}
+
+.body {
+  font-family: var(--font-meta), monospace;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--color-text-meta);
+  margin: 0;
+}
+
+.btn {
+  font-family: var(--font-meta), monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.55rem 0.85rem;
+  align-self: flex-start;
+  border: 1.5px solid var(--color-text-meta);
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.btn:hover:not(:disabled) {
+  border-color: var(--color-wada-3);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.45rem 0.55rem;
+  font-family: var(--font-meta), monospace;
+  font-size: 0.6rem;
+  border: 1px solid var(--color-text-meta);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.45);
+  color: var(--color-text);
+}
+
+.btnPrimary {
+  font-family: var(--font-meta), monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.5rem 0.85rem;
+  border: none;
+  border-radius: 9999px;
+  background: var(--color-text);
+  color: var(--color-bg);
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.linkish {
+  font-family: var(--font-meta), monospace;
+  font-size: 0.62rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  color: var(--color-text-meta);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  align-self: flex-start;
+}
+
+.linkish:hover:not(:disabled) {
+  color: var(--color-text);
+}
+
+.error {
+  font-family: var(--font-meta), monospace;
+  font-size: 0.7rem;
+  color: var(--color-wada-1);
+  margin: 0;
+}
+
+@media (min-width: 420px) {
+  .row {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .row .input {
+    flex: 1;
+    min-width: 0;
+  }
+}

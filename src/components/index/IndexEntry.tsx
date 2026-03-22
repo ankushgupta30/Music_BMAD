@@ -10,6 +10,8 @@ interface IndexEntryProps {
   songName: string;
   releaseYear: number;
   hoverColorIndex: number;
+  /** Base path without trailing slash, e.g. `/entry` or `/share/TOKEN/entry` */
+  entryHrefBase?: string;
 }
 
 export default function IndexEntry({
@@ -18,6 +20,7 @@ export default function IndexEntry({
   songName,
   releaseYear,
   hoverColorIndex,
+  entryHrefBase = "/entry",
 }: IndexEntryProps) {
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -36,7 +39,7 @@ export default function IndexEntry({
 
   return (
     <Link
-      href={`/entry/${id}`}
+      href={`${entryHrefBase}/${id}`}
       className={`font-display no-underline indexArtistLink ${
         active ? "" : "text-dotted"
       }`}

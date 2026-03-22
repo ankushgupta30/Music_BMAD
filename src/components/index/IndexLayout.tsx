@@ -9,6 +9,8 @@ import layoutStyles from "./index-layout.module.css";
 
 interface IndexLayoutProps {
   entries: Entry[];
+  /** Base for entry links (default `/entry`). Shared journal: `/share/[token]/entry` */
+  entryHrefBase?: string;
 }
 
 function chunkEntries<T>(items: T[], rowCount: number): T[][] {
@@ -40,7 +42,11 @@ function repeatRowEntries<T>(items: T[], copies: number): T[] {
   return out;
 }
 
-function renderEntryUnit(entry: Entry, keySuffix: string) {
+function renderEntryUnit(
+  entry: Entry,
+  keySuffix: string,
+  entryHrefBase: string
+) {
   return (
     <div key={keySuffix} className={layoutStyles.entryUnit}>
       <div className={layoutStyles.artistCell}>
@@ -50,6 +56,7 @@ function renderEntryUnit(entry: Entry, keySuffix: string) {
           songName={entry.song_name}
           releaseYear={entry.release_year}
           hoverColorIndex={entry.hover_color_index}
+          entryHrefBase={entryHrefBase}
         />
       </div>
 
@@ -59,6 +66,7 @@ function renderEntryUnit(entry: Entry, keySuffix: string) {
             entryId={entry.id}
             artworkUrl={entry.artwork_url}
             albumName={entry.album_name}
+            entryHrefBase={entryHrefBase}
           />
           <span className={layoutStyles.metaStack}>
             <span className={layoutStyles.metaSong}>{entry.song_name}</span>
@@ -72,7 +80,10 @@ function renderEntryUnit(entry: Entry, keySuffix: string) {
   );
 }
 
-export default function IndexLayout({ entries }: IndexLayoutProps) {
+export default function IndexLayout({
+  entries,
+  entryHrefBase = "/entry",
+}: IndexLayoutProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const rows = chunkEntries(entries, tapestryRowCount(entries.length));
 
@@ -106,7 +117,8 @@ export default function IndexLayout({ entries }: IndexLayoutProps) {
             {repeatRowEntries(row, ROW_HORIZONTAL_COPIES).map((entry, segIndex) =>
               renderEntryUnit(
                 entry,
-                `${entry.id}-r${rowIndex}-s${segIndex}`
+                `${entry.id}-r${rowIndex}-s${segIndex}`,
+                entryHrefBase
               )
             )}
           </div>

@@ -1,0 +1,66 @@
+.main {
+  min-height: 100vh;
+  padding: clamp(1.5rem, 5vw, 3rem);
+  max-width: 36rem;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.center {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.kicker {
+  font-family: var(--font-meta), monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-text-meta);
+  margin: 0 0 1.25rem;
+}
+
+.artWrap {
+  margin-bottom: 1.5rem;
+  max-width: 280px;
+}
+
+.art {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 12px 40px rgba(26, 26, 26, 0.12);
+}
+
+.artist {
+  font-size: clamp(1.75rem, 5vw, 2.75rem);
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.05;
+  margin: 0 0 0.35rem;
+  letter-spacing: -0.02em;
+}
+
+.meta {
+  font-size: var(--type-meta);
+  color: var(--color-text-meta);
+  margin: 0 0 2rem;
+  line-height: 1.4;
+}
+
+.noteBlock {
+  padding: 1.25rem 0;
+  border-top: 1px solid var(--color-text-meta);
+}
+
+.note {
+  font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+  line-height: 1.45;
+  color: var(--color-text);
+  margin: 0;
+  white-space: pre-wrap;
+}
