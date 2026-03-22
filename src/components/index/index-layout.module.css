@@ -20,7 +20,8 @@
   padding-inline-start: 0;
 }
 
-.tapestryRow.tapestryRowStagger {
+/* Own rule (not chained) so CSS Modules always emit it for odd rows */
+.tapestryRowStagger {
   padding-inline-start: var(--tapestry-stagger);
 }
 

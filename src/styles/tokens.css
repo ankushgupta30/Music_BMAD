@@ -42,11 +42,11 @@
   --gap-entry: clamp(0.25rem, 1vw, 1.5rem);
   /* Space between artist column and cover+meta cluster (~50px desktop) */
   --cover-meta-pl: clamp(1rem, 3vw, 3.125rem);
-  /* Vertical space between tapestry rows (inner clamp × 1.05) */
-  --tapestry-row-gap-inner: clamp(0.18rem, 0.25em, 0.42rem);
+  /* Vertical space between tapestry rows (inner clamp × 1.05) — keep readable */
+  --tapestry-row-gap-inner: clamp(0.28rem, 0.4em, 0.65rem);
   --tapestry-row-gap: calc(var(--tapestry-row-gap-inner) * 1.05);
   /* Alternating row inset (zig-zag); does not affect rail margin */
-  --tapestry-stagger: clamp(1.5rem, 5vw, 4rem);
+  --tapestry-stagger: clamp(2rem, 6vw, 4.5rem);
   --gap-tapestry-inline: clamp(1.25rem, 2.5vw, 2.5rem);
   /* Sidebar natural width for panel positioning */
   --sidebar-width: 4rem;
