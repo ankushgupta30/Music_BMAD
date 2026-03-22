@@ -63,3 +63,38 @@ export async function addEntry(input: AddEntryInput) {
     };
   }
 }
+
+export async function updateEntryNote(entryId: string, noteText: string) {
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false as const, error: "Sign in to save notes." };
+    }
+
+    const { error } = await supabase
+      .from("entries")
+      .update({
+        note_text: noteText,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", entryId);
+
+    if (error) {
+      return { success: false as const, error: error.message };
+    }
+
+    revalidatePath("/");
+    revalidatePath(`/entry/${entryId}`);
+    return { success: true as const };
+  } catch (e) {
+    return {
+      success: false as const,
+      error: e instanceof Error ? e.message : "Failed to save note.",
+    };
+  }
+}

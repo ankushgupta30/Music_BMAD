@@ -2,6 +2,7 @@ import Link from "next/link";
 import { SEED_ENTRIES } from "@/lib/utils/seedData";
 import { createClient } from "@/lib/supabase/server";
 import type { Entry } from "@/types/entry";
+import EntryNoteEditor from "@/components/entry/EntryNoteEditor";
 import styles from "./entry.module.css";
 
 interface EntryPageProps {
@@ -40,9 +41,29 @@ async function getEntry(id: string): Promise<Entry | undefined> {
   return SEED_ENTRIES.find((e) => e.id === id);
 }
 
+function formatAddedAt(iso: string | undefined): string | null {
+  if (!iso) return null;
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  } catch {
+    return null;
+  }
+}
+
 export default async function EntryPage({ params }: EntryPageProps) {
   const { id } = await params;
   const entry = await getEntry(id);
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const authenticated = !!user;
 
   if (!entry) {
     return (
@@ -56,6 +77,8 @@ export default async function EntryPage({ params }: EntryPageProps) {
       </main>
     );
   }
+
+  const addedLabel = formatAddedAt(entry.date_added);
 
   return (
     <main className="min-h-screen" style={{ padding: "var(--margin-x)" }}>
@@ -87,6 +110,19 @@ export default async function EntryPage({ params }: EntryPageProps) {
         {entry.release_year > 0 ? ` · ${entry.release_year}` : ""}
       </p>
 
+      {addedLabel && (
+        <p
+          className="font-meta mt-1"
+          style={{
+            fontSize: "clamp(0.65rem, 1.5vw, 0.8rem)",
+            color: "var(--color-text-meta)",
+            letterSpacing: "0.06em",
+          }}
+        >
+          Added {addedLabel}
+        </p>
+      )}
+
       {entry.artwork_url && (
         <div className="mt-8">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -101,18 +137,11 @@ export default async function EntryPage({ params }: EntryPageProps) {
         </div>
       )}
 
-      <div className="mt-12">
-        <p
-          className="font-hand"
-          style={{
-            fontSize: "1.25rem",
-            color: "var(--color-text-meta)",
-            fontStyle: "italic",
-          }}
-        >
-          Your notes will appear here...
-        </p>
-      </div>
+      <EntryNoteEditor
+        entryId={entry.id}
+        initialNote={entry.note_text}
+        authenticated={authenticated}
+      />
     </main>
   );
 }
