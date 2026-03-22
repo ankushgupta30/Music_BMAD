@@ -68,10 +68,16 @@
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
   box-sizing: border-box;
-  /* Symmetric block padding; inline matches L/R (no extra dead zone bottom-right) */
+  /* Explicit L/R so every browser applies the gutter; safe-area on notched devices */
   padding-block: var(--index-scroll-pad-block);
-  padding-inline: max(var(--margin-index-inline), env(safe-area-inset-left, 0px))
-    max(var(--margin-index-inline), env(safe-area-inset-right, 0px));
+  padding-left: max(
+    var(--margin-index-inline),
+    env(safe-area-inset-left, 0px)
+  );
+  padding-right: max(
+    var(--margin-index-inline),
+    env(safe-area-inset-right, 0px)
+  );
   line-height: 1.08;
   scroll-snap-type: x proximity;
 }

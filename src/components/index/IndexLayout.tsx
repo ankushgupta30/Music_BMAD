@@ -108,12 +108,7 @@ export default function IndexLayout({
     <div ref={scrollRef} className={shellStyles.indexScroll}>
       <div className={layoutStyles.tapestry}>
         {rows.map((row, rowIndex) => (
-          <div
-            key={`tapestry-row-${rowIndex}`}
-            className={`${layoutStyles.tapestryRow} ${
-              rowIndex % 2 === 1 ? layoutStyles.tapestryRowStagger : ""
-            }`}
-          >
+          <div key={`tapestry-row-${rowIndex}`} className={layoutStyles.tapestryRow}>
             {repeatRowEntries(row, ROW_HORIZONTAL_COPIES).map((entry, segIndex) =>
               renderEntryUnit(
                 entry,

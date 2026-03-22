@@ -20,9 +20,7 @@
   padding-inline-start: 0;
 }
 
-.tapestryRow.tapestryRowStagger {
-  padding-inline-start: var(--tapestry-stagger);
-}
+/* Stagger removed: alternating inset made the left margin look “wrong” row-to-row */
 
 /* One entry: artist + cover/meta, packed */
 .entryUnit {
