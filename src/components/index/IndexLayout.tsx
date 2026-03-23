@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useLayoutEffect, useMemo } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import type { Entry } from "@/types/entry";
 import IndexEntry from "./IndexEntry";
 import InlineArtwork from "./InlineArtwork";
@@ -50,17 +50,8 @@ function renderEntryUnit(
   /** Only the first horizontal ribbon copy is in tab order (Story 1.8). */
   includeInTabOrder: boolean
 ) {
-  const tier = entry.scale_tier;
-  const scaleAttr =
-    tier === "large" || tier === "small" || tier === "medium" ? tier : "medium";
-
   return (
-    <div
-      key={keySuffix}
-      className={layoutStyles.entryUnit}
-      data-scale-tier={scaleAttr}
-      data-entry-unit=""
-    >
+    <div key={keySuffix} className={layoutStyles.entryUnit}>
       <div className={layoutStyles.artistCell}>
         <IndexEntry
           id={entry.id}
@@ -104,11 +95,6 @@ export default function IndexLayout({
     [entries]
   );
 
-  const entryStructureKey = useMemo(
-    () => `${entries.length}:${entries.map((e) => e.id).join(",")}`,
-    [entries]
-  );
-
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -126,41 +112,6 @@ export default function IndexLayout({
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
   }, []);
-
-  /** Scroll-linked affordance: entries near the viewport center read as “active” without hover. */
-  useLayoutEffect(() => {
-    const root = scrollRef.current;
-    if (!root || entries.length === 0) return;
-
-    const reduceMotion =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduceMotion) return;
-
-    const targets = root.querySelectorAll<HTMLElement>("[data-entry-unit]");
-    if (targets.length === 0) return;
-
-    const io = new IntersectionObserver(
-      (records) => {
-        for (const record of records) {
-          const el = record.target as HTMLElement;
-          if (record.isIntersecting && record.intersectionRatio >= 0.22) {
-            el.dataset.scrollActive = "true";
-          } else {
-            delete el.dataset.scrollActive;
-          }
-        }
-      },
-      {
-        root,
-        rootMargin: "-10% 0px -12% 0px",
-        threshold: [0, 0.12, 0.22, 0.4, 0.65],
-      }
-    );
-
-    targets.forEach((node) => io.observe(node));
-    return () => io.disconnect();
-  }, [entries.length, entryStructureKey]);
 
   if (entries.length === 0) {
     return (
