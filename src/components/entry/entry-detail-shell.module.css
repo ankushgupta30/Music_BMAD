@@ -96,6 +96,20 @@
   text-shadow: 0 0.5px 0 rgba(26, 26, 26, 0.08);
 }
 
+.triviaSource {
+  margin: 0.55rem 0 0;
+  font-family: var(--font-meta), monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: rgba(26, 26, 26, 0.72);
+}
+
+.triviaSource a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .postItStack {
   position: relative;
   min-height: 9.5rem;

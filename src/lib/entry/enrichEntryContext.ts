@@ -2,7 +2,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { fetchLastFmTrackWikiSummary, isLastFmConfigured } from "@/lib/lastfm/trackWiki";
 import { fetchRenditionsForEntry } from "@/lib/spotify/renditions";
 import { isSpotifyConfigured } from "@/lib/spotify/client";
-import type { Entry, EntryRendition } from "@/types/entry";
+import { fetchRedditTriviaItems } from "@/lib/reddit/trivia";
+import type { Entry, EntryRendition, EntryTriviaItem } from "@/types/entry";
 
 const CONTEXT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -29,6 +30,7 @@ export async function enrichEntryContext(
   const seedEntry = isSeedEntryId(entry.id);
 
   let trivia: string | null = entry.trivia_summary;
+  let triviaItems: EntryTriviaItem[] = entry.trivia_items ?? [];
   let renditions: EntryRendition[] = entry.renditions ?? [];
 
   try {
@@ -37,6 +39,36 @@ export async function enrichEntryContext(
         entry.artist_name,
         entry.song_name || entry.album_name
       );
+      if (trivia && trivia.trim().length > 0) {
+        triviaItems = [
+          {
+            text: trivia,
+            source_type: "lastfm",
+            source_url: null,
+            score: null,
+            fetched_at: new Date().toISOString(),
+          },
+        ];
+      }
+    }
+
+    const redditItems = await fetchRedditTriviaItems(
+      entry.artist_name,
+      entry.song_name || entry.album_name
+    );
+    if (redditItems.length > 0) {
+      const existing = new Set(triviaItems.map((item) => item.text.trim().toLowerCase()));
+      for (const item of redditItems) {
+        const key = item.text.trim().toLowerCase();
+        if (existing.has(key)) continue;
+        triviaItems.push(item);
+        existing.add(key);
+      }
+    }
+
+    // Keep legacy UI populated while structured trivia rolls out.
+    if ((!trivia || trivia.trim().length === 0) && triviaItems.length > 0) {
+      trivia = triviaItems[0]?.text ?? null;
     }
 
     if (isSpotifyConfigured()) {
@@ -57,6 +89,7 @@ export async function enrichEntryContext(
     return {
       ...entry,
       trivia_summary: trivia,
+      trivia_items: triviaItems,
       renditions,
       context_fetched_at: fetchedAt,
     };
@@ -66,6 +99,7 @@ export async function enrichEntryContext(
     .from("entries")
     .update({
       trivia_summary: trivia,
+      trivia_items_json: triviaItems,
       renditions_json: renditions,
       context_fetched_at: fetchedAt,
     })
@@ -76,6 +110,7 @@ export async function enrichEntryContext(
     return {
       ...entry,
       trivia_summary: trivia,
+      trivia_items: triviaItems,
       renditions,
       context_fetched_at: entry.context_fetched_at,
     };
@@ -84,6 +119,7 @@ export async function enrichEntryContext(
   return {
     ...entry,
     trivia_summary: trivia,
+    trivia_items: triviaItems,
     renditions,
     context_fetched_at: fetchedAt,
   };

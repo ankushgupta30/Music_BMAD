@@ -7,6 +7,23 @@ export interface EntryRendition {
   artist_name: string;
 }
 
+export type TriviaSourceType =
+  | "lastfm"
+  | "reddit"
+  | "wiki"
+  | "interview"
+  | "editorial"
+  | "other";
+
+/** Canonical trivia item shape for multi-source aggregation. */
+export interface EntryTriviaItem {
+  text: string;
+  source_type: TriviaSourceType;
+  source_url: string | null;
+  score: number | null;
+  fetched_at: string;
+}
+
 export interface Entry {
   id: string;
   spotify_id: string;
@@ -24,6 +41,8 @@ export interface Entry {
   updated_at: string;
   /** Plain-text wiki-style trivia; null if not fetched or unavailable */
   trivia_summary: string | null;
+  /** Structured trivia items with provenance + ranking metadata */
+  trivia_items: EntryTriviaItem[];
   /** Popular / alternate renditions of the same song title */
   renditions: EntryRendition[];
   /** ISO timestamp of last server refresh of trivia + renditions */

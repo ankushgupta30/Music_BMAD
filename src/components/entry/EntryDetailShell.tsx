@@ -26,6 +26,23 @@ interface EntryDetailShellProps {
   journalColumn: ReactNode;
 }
 
+function sourceLabel(kind: Entry["trivia_items"][number]["source_type"]): string {
+  switch (kind) {
+    case "lastfm":
+      return "Last.fm";
+    case "reddit":
+      return "Reddit";
+    case "wiki":
+      return "Wiki";
+    case "interview":
+      return "Interview";
+    case "editorial":
+      return "Editorial";
+    default:
+      return "Source";
+  }
+}
+
 export default function EntryDetailShell({
   entry,
   backHref,
@@ -33,8 +50,16 @@ export default function EntryDetailShell({
   journalColumn,
 }: EntryDetailShellProps) {
   const addedLabel = formatAddedAt(entry.date_added);
-  const showTrivia =
-    entry.trivia_summary != null && entry.trivia_summary.trim().length > 0;
+  const rankedTrivia = [...(entry.trivia_items ?? [])].sort(
+    (a, b) => (b.score ?? -Infinity) - (a.score ?? -Infinity)
+  );
+  const topTrivia = rankedTrivia[0] ?? null;
+  const fallbackTrivia =
+    entry.trivia_summary && entry.trivia_summary.trim().length > 0
+      ? entry.trivia_summary
+      : null;
+  const triviaText = topTrivia?.text?.trim() || fallbackTrivia;
+  const showTrivia = Boolean(triviaText && triviaText.length > 0);
   const postItVariant = showTrivia ? styles.postItYellow : styles.postItBlue;
 
   return (
@@ -107,13 +132,28 @@ export default function EntryDetailShell({
               </div>
               <div className={`${styles.postIt} ${postItVariant}`}>
                 {showTrivia ? (
-                  <p className={styles.triviaHand}>{entry.trivia_summary}</p>
+                  <>
+                    <p className={styles.triviaHand}>{triviaText}</p>
+                    {topTrivia ? (
+                      <p className={styles.triviaSource}>
+                        Source: {sourceLabel(topTrivia.source_type)}
+                        {topTrivia.source_url ? (
+                          <>
+                            {" · "}
+                            <a
+                              href={topTrivia.source_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              open
+                            </a>
+                          </>
+                        ) : null}
+                      </p>
+                    ) : null}
+                  </>
                 ) : (
-                  <p className={styles.hintText}>
-                    {entry.context_fetched_at
-                      ? "No public write-up found for this track yet."
-                      : "No public write-up found for this track yet."}
-                  </p>
+                  <p className={styles.hintText}>No public write-up found for this track yet.</p>
                 )}
               </div>
             </div>

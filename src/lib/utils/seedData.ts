@@ -29,6 +29,7 @@ export const CURATED_DEMO_ENTRY: Entry = {
   date_added: new Date(Date.UTC(2026, 0, 22)).toISOString(),
   updated_at: new Date(Date.UTC(2026, 0, 22)).toISOString(),
   trivia_summary: null,
+  trivia_items: [],
   renditions: [],
   context_fetched_at: null,
 };
@@ -51,6 +52,7 @@ export const SEED_ENTRIES: Entry[] = (parsedPairs as ParsedPair[]).map(
       date_added: iso,
       updated_at: iso,
       trivia_summary: null,
+      trivia_items: [],
       renditions: [],
       context_fetched_at: null,
     };
