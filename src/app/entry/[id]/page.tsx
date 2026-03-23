@@ -60,14 +60,16 @@ export default async function EntryPage({ params }: EntryPageProps) {
   }
 
   let { entry } = resolved;
-  if (resolved.fromDb) {
-    entry = await enrichEntryContext(entry, supabase);
-  }
+  entry = await enrichEntryContext(entry, supabase);
 
   return (
     <main
       className="min-h-screen flex flex-col box-border"
-      style={{ padding: "var(--margin-x)", minHeight: "100dvh" }}
+      style={{
+        padding: "var(--margin-x)",
+        minHeight: "100dvh",
+        backgroundColor: "var(--color-text)",
+      }}
     >
       <EntryDetailShell
         entry={entry}

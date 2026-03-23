@@ -19,10 +19,6 @@ function formatAddedAt(iso: string | undefined): string | null {
   }
 }
 
-function spotifyOpenUrl(trackId: string): string {
-  return `https://open.spotify.com/track/${trackId}`;
-}
-
 interface EntryDetailShellProps {
   entry: Entry;
   backHref: string;
@@ -39,7 +35,6 @@ export default function EntryDetailShell({
   const addedLabel = formatAddedAt(entry.date_added);
   const showTrivia =
     entry.trivia_summary != null && entry.trivia_summary.trim().length > 0;
-  const showRenditions = entry.renditions.length > 0;
   const postItVariant = showTrivia ? styles.postItYellow : styles.postItBlue;
 
   return (
@@ -101,11 +96,8 @@ export default function EntryDetailShell({
 
           <section
             className={`${styles.paperCard} ${styles.section} ${styles.pinShadow}`}
-            aria-labelledby="trivia-heading"
+            aria-label="Trivia"
           >
-            <h2 id="trivia-heading" className={styles.sectionLabel}>
-              Trivia
-            </h2>
             <div className={styles.postItStack}>
               <div className={`${styles.postIt} ${styles.postItPeach}`}>
                 <p className={styles.postItMeta}>archive note</p>
@@ -125,39 +117,6 @@ export default function EntryDetailShell({
                 )}
               </div>
             </div>
-          </section>
-
-          <section
-            className={`${styles.paperCard} ${styles.section}`}
-            aria-labelledby="renditions-heading"
-          >
-            <h2 id="renditions-heading" className={styles.sectionLabel}>
-              Other renditions
-            </h2>
-            {showRenditions ? (
-              <ul className={styles.renditionList}>
-                {entry.renditions.map((r) => (
-                  <li key={r.spotify_id}>
-                    <a
-                      href={spotifyOpenUrl(r.spotify_id)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {r.title}
-                    </a>
-                    <span className={styles.renditionMeta}>
-                      — {r.artist_name}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className={styles.hintText}>
-                {entry.context_fetched_at
-                  ? "No alternate recordings surfaced for this title (Spotify search)."
-                  : "Cover versions and alternate recordings appear when Spotify credentials are configured."}
-              </p>
-            )}
           </section>
         </div>
 

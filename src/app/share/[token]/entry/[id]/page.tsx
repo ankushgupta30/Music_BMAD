@@ -45,7 +45,11 @@ export default async function SharedEntryPage({ params }: Props) {
   return (
     <main
       className="min-h-screen flex flex-col box-border"
-      style={{ padding: "var(--margin-x)", minHeight: "100dvh" }}
+      style={{
+        padding: "var(--margin-x)",
+        minHeight: "100dvh",
+        backgroundColor: "var(--color-text)",
+      }}
     >
       <EntryDetailShell
         entry={entry}

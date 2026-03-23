@@ -25,8 +25,8 @@ export async function enrichEntryContext(
   entry: Entry,
   supabase: SupabaseClient
 ): Promise<Entry> {
-  if (isSeedEntryId(entry.id)) return entry;
   if (isContextFresh(entry)) return entry;
+  const seedEntry = isSeedEntryId(entry.id);
 
   let trivia: string | null = entry.trivia_summary;
   let renditions: EntryRendition[] = entry.renditions ?? [];
@@ -52,6 +52,15 @@ export async function enrichEntryContext(
   }
 
   const fetchedAt = new Date().toISOString();
+
+  if (seedEntry) {
+    return {
+      ...entry,
+      trivia_summary: trivia,
+      renditions,
+      context_fetched_at: fetchedAt,
+    };
+  }
 
   const { error } = await supabase
     .from("entries")

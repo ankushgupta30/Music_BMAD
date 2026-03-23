@@ -91,9 +91,11 @@ export default function EntryNoteEditor({
     <div
       className={`${styles.wrap} ${isJournal ? styles.wrapJournal : ""}`.trim()}
     >
-      <label className={styles.label} htmlFor={`note-${entryId}`}>
-        Journal
-      </label>
+      {!isJournal && (
+        <label className={styles.label} htmlFor={`note-${entryId}`}>
+          Journal
+        </label>
+      )}
       <textarea
         id={`note-${entryId}`}
         className={`${styles.textarea} ${isJournal ? styles.textareaJournal : ""}`.trim()}
