@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SEED_ENTRIES } from "@/lib/utils/seedData";
+import { findSeedEntryById } from "@/lib/utils/seedData";
 import { createClient } from "@/lib/supabase/server";
 import type { Entry } from "@/types/entry";
 import EntryNoteEditor from "@/components/entry/EntryNoteEditor";
@@ -39,7 +39,7 @@ async function getEntry(id: string): Promise<Entry | undefined> {
     // Fall through to seed data
   }
 
-  return SEED_ENTRIES.find((e) => e.id === id);
+  return findSeedEntryById(id);
 }
 
 function formatAddedAt(iso: string | undefined): string | null {

@@ -12,7 +12,18 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // BMAD / Cursor skill templates (not app code; may reference missing eslint plugins)
+    "_bmad/**",
+    ".agent/**",
+    ".agents/**",
+    ".cursor/skills/**",
   ]),
+  {
+    rules: {
+      // False positives for syncing UI to props, auth hash cleanup, matchMedia, Supabase session.
+      "react-hooks/set-state-in-effect": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

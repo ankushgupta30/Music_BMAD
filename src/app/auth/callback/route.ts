@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   }
 
   const redirectUrl = `${origin}${next.startsWith("/") ? next : `/${next}`}`;
-  let response = NextResponse.redirect(redirectUrl);
+  const response = NextResponse.redirect(redirectUrl);
 
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {

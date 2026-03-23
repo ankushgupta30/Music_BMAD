@@ -1,3 +1,43 @@
+/* Authenticated user, zero saved entries */
+.emptyState {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  box-sizing: border-box;
+  padding-block: var(--index-scroll-pad-block);
+  padding-inline: max(var(--index-pane-inline), env(safe-area-inset-left, 0px))
+    max(var(--index-pane-inline), env(safe-area-inset-right, 0px));
+  max-width: 28rem;
+}
+
+.emptyStateTitle {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(1.35rem, 3.2vw, 2.25rem);
+  color: var(--color-text);
+  margin: 0 0 0.75rem;
+  line-height: 1.12;
+}
+
+.emptyStateBody {
+  font-family: var(--font-meta), monospace;
+  font-size: var(--type-meta-index);
+  color: var(--color-text-meta);
+  margin: 0;
+  line-height: 1.45;
+  letter-spacing: 0.04em;
+}
+
+@media (min-width: 640px) {
+  .emptyState {
+    padding-left: max(0px, env(safe-area-inset-left, 0px));
+    padding-right: max(var(--index-pane-inline), env(safe-area-inset-right, 0px));
+  }
+}
+
 /* Stacked horizontal bands inside scroll viewport */
 .tapestry {
   display: flex;

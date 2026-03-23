@@ -104,6 +104,24 @@ export default function IndexLayout({
     return () => el.removeEventListener("wheel", onWheel);
   }, []);
 
+  if (entries.length === 0) {
+    return (
+      <div className={shellStyles.indexScrollViewport}>
+        <div
+          className={layoutStyles.emptyState}
+          role="status"
+          aria-live="polite"
+        >
+          <h2 className={layoutStyles.emptyStateTitle}>Nothing saved yet</h2>
+          <p className={layoutStyles.emptyStateBody}>
+            Open the Spotify icon, connect, and search to add your first track.
+            Your typographic journal will grow here.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={shellStyles.indexScrollViewport}>
       <div ref={scrollRef} className={shellStyles.indexScroll}>
