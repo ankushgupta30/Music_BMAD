@@ -106,16 +106,24 @@ export default function EntryDetailShell({
             <h2 id="trivia-heading" className={styles.sectionLabel}>
               Trivia
             </h2>
-            <div className={`${styles.postIt} ${postItVariant}`}>
-              {showTrivia ? (
-                <p className={styles.triviaHand}>{entry.trivia_summary}</p>
-              ) : (
-                <p className={styles.hintText}>
-                  {entry.context_fetched_at
-                    ? "No public write-up found for this track yet."
-                    : "Trivia loads from Last.fm when your server has LASTFM_API_KEY set."}
+            <div className={styles.postItStack}>
+              <div className={`${styles.postIt} ${styles.postItPeach}`}>
+                <p className={styles.postItMeta}>archive note</p>
+                <p className={styles.postItMetaLine}>
+                  {entry.song_name} · {entry.release_year > 0 ? entry.release_year : "unknown year"}
                 </p>
-              )}
+              </div>
+              <div className={`${styles.postIt} ${postItVariant}`}>
+                {showTrivia ? (
+                  <p className={styles.triviaHand}>{entry.trivia_summary}</p>
+                ) : (
+                  <p className={styles.hintText}>
+                    {entry.context_fetched_at
+                      ? "No public write-up found for this track yet."
+                      : "Trivia loads from Last.fm when your server has LASTFM_API_KEY set."}
+                  </p>
+                )}
+              </div>
             </div>
           </section>
 

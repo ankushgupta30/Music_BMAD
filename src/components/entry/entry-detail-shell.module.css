@@ -41,10 +41,11 @@
 .paperSheet,
 .paperCard {
   position: relative;
-  background: #f7f4ee;
+  background: #faf6ee;
+  border: 1px solid rgba(26, 26, 26, 0.1);
   box-shadow:
-    0 1px 0 rgba(26, 26, 26, 0.06),
-    0 10px 24px rgba(26, 26, 26, 0.08);
+    0 2px 0 rgba(26, 26, 26, 0.05),
+    0 14px 30px rgba(26, 26, 26, 0.12);
 }
 
 .paperSheet {
@@ -57,14 +58,16 @@
 
 .heroGroup {
   margin-top: 0.2rem;
+  transform: rotate(-0.25deg);
+  transform-origin: top left;
 }
 
 .hintText {
   margin: 0;
-  font-family: var(--font-meta), monospace;
-  font-size: 0.75rem;
-  color: var(--color-text-meta);
-  line-height: 1.45;
+  font-family: var(--font-hand), "Segoe Script", cursive;
+  font-size: clamp(1.1rem, 1.8vw, 1.3rem);
+  color: rgba(26, 26, 26, 0.75);
+  line-height: 1.5;
 }
 
 .section {
@@ -85,19 +88,29 @@
   margin: 0;
   max-width: 40rem;
   font-family: var(--font-hand), "Segoe Script", cursive;
-  font-size: clamp(1.15rem, 2vw, 1.45rem);
-  line-height: 1.5;
+  font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+  line-height: 1.55;
   color: var(--color-text);
   letter-spacing: 0.01em;
-  transform: rotate(-0.25deg);
+  transform: rotate(-0.15deg);
   text-shadow: 0 0.5px 0 rgba(26, 26, 26, 0.08);
+}
+
+.postItStack {
+  position: relative;
+  min-height: 9.5rem;
+  margin-top: 0.2rem;
 }
 
 .postIt {
   position: relative;
   margin-top: 0.25rem;
   padding: 0.9rem 1rem 1rem;
-  max-width: min(100%, 38rem);
+  max-width: min(100%, 39rem);
+  border: 1px solid rgba(26, 26, 26, 0.14);
+  box-shadow:
+    0 2px 0 rgba(26, 26, 26, 0.08),
+    0 10px 20px rgba(26, 26, 26, 0.18);
 }
 
 .postIt::after {
@@ -113,18 +126,40 @@
 }
 
 .postItYellow {
-  background: #f7e49e;
-  transform: rotate(-1.1deg);
+  background: #f4dc84;
+  transform: rotate(-1.4deg);
 }
 
 .postItBlue {
-  background: #dce8f5;
-  transform: rotate(0.8deg);
+  background: #d5e5f5;
+  transform: rotate(1deg);
 }
 
 .postItPeach {
-  background: #f3d8c6;
-  transform: rotate(-0.7deg);
+  background: #f3d0bd;
+  width: min(72%, 22rem);
+  transform: rotate(2.2deg);
+  position: absolute;
+  right: 0.35rem;
+  top: -0.1rem;
+  z-index: 0;
+  opacity: 0.95;
+}
+
+.postItMeta {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.62rem;
+  color: rgba(26, 26, 26, 0.6);
+  font-family: var(--font-meta), monospace;
+}
+
+.postItMetaLine {
+  margin: 0.25rem 0 0;
+  font-family: var(--font-hand), "Segoe Script", cursive;
+  font-size: clamp(0.95rem, 1.8vw, 1.05rem);
+  color: rgba(26, 26, 26, 0.85);
 }
 
 .pinShadow {
@@ -171,7 +206,7 @@
   border-radius: 0;
   border: none;
   box-shadow: none;
-  background-color: #f7f4ee;
+  background-color: #faf6ee;
   background-image:
     linear-gradient(rgba(26, 26, 26, 0.055) 1px, transparent 1px);
   background-size: 100% 1.5rem;
@@ -201,5 +236,13 @@
 
   .postIt {
     max-width: 100%;
+  }
+
+  .postItPeach {
+    position: relative;
+    width: min(100%, 20rem);
+    right: auto;
+    top: auto;
+    margin-bottom: 0.35rem;
   }
 }
