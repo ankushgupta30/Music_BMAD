@@ -2,7 +2,6 @@ import { findSeedEntryById } from "@/lib/utils/seedData";
 import { createClient } from "@/lib/supabase/server";
 import type { Entry } from "@/types/entry";
 import EntryNoteEditor from "@/components/entry/EntryNoteEditor";
-import PostcardComposer from "@/components/entry/PostcardComposer";
 import EntryDetailShell from "@/components/entry/EntryDetailShell";
 import { enrichEntryContext } from "@/lib/entry/enrichEntryContext";
 import { mapEntryRow } from "@/lib/utils/mapEntryRow";
@@ -66,26 +65,21 @@ export default async function EntryPage({ params }: EntryPageProps) {
   }
 
   return (
-    <main className="min-h-screen" style={{ padding: "var(--margin-x)" }}>
+    <main
+      className="min-h-screen flex flex-col box-border"
+      style={{ padding: "var(--margin-x)", minHeight: "100dvh" }}
+    >
       <EntryDetailShell
         entry={entry}
         backHref="/"
         backLabel="← Index"
         journalColumn={
-          <>
-            <PostcardComposer
-              entryId={entry.id}
-              artistName={entry.artist_name}
-              albumName={entry.album_name}
-              artworkUrl={entry.artwork_url || null}
-              authenticated={authenticated}
-            />
-            <EntryNoteEditor
-              entryId={entry.id}
-              initialNote={entry.note_text}
-              authenticated={authenticated}
-            />
-          </>
+          <EntryNoteEditor
+            entryId={entry.id}
+            initialNote={entry.note_text}
+            authenticated={authenticated}
+            variant="journal"
+          />
         }
       />
     </main>

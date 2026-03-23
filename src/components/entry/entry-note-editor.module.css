@@ -1,6 +1,18 @@
 .wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   margin-top: 2.5rem;
   max-width: 42rem;
+}
+
+/* Detail page journal column: fills the sheet, no field box */
+.wrapJournal {
+  margin-top: 0;
+  max-width: none;
+  flex: 1;
+  min-height: min(55dvh, 32rem);
 }
 
 .label {
@@ -29,6 +41,18 @@
   transition: border-color var(--duration-hover) ease-out;
 }
 
+/* Borderless: sits on the lined journal; rhythm ~1.5rem to match rules */
+.textareaJournal {
+  flex: 1;
+  min-height: 12rem;
+  padding: 0.15rem 0.15rem 1rem;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  line-height: 1.5rem;
+  resize: vertical;
+}
+
 .textarea::placeholder {
   color: var(--color-text-meta);
   opacity: 0.65;
@@ -43,10 +67,29 @@
   border-color: var(--color-wada-4);
 }
 
+.textareaJournal:hover:not(:disabled) {
+  border-color: transparent;
+}
+
+.textareaJournal:focus {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
+.textareaJournal:focus-visible {
+  outline: 2px solid var(--color-wada-4);
+  outline-offset: 4px;
+}
+
 .textarea:disabled {
   opacity: 0.85;
   cursor: not-allowed;
   background: var(--color-bg-dim);
+}
+
+.textareaJournal:disabled {
+  background: transparent;
 }
 
 .meta {

@@ -1,14 +1,27 @@
+.shell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: min(100%, calc(100dvh - 6rem));
+}
+
 .grid {
+  flex: 1;
+  min-height: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 380px);
-  gap: clamp(1.75rem, 4vw, 3.5rem);
-  align-items: start;
-  margin-top: clamp(1rem, 3vw, 2rem);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(1.75rem, 4vw, 3rem);
+  align-items: stretch;
+  margin-top: clamp(0.5rem, 2vw, 1rem);
 }
 
 @media (max-width: 900px) {
   .grid {
     grid-template-columns: 1fr;
+  }
+
+  .shell {
+    min-height: 0;
   }
 }
 
@@ -20,24 +33,7 @@
   margin-top: 0.35rem;
 }
 
-.lyricsPlaceholder {
-  margin-top: clamp(1.5rem, 3vw, 2.25rem);
-  padding: 1rem 1.1rem;
-  border-radius: 6px;
-  border: 1px dashed var(--color-text-meta);
-  background: rgba(255, 255, 255, 0.25);
-}
-
-.lyricsLabel {
-  font-family: var(--font-meta), monospace;
-  font-size: 0.7rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-meta);
-  margin: 0 0 0.5rem;
-}
-
-.lyricsHint {
+.hintText {
   margin: 0;
   font-family: var(--font-meta), monospace;
   font-size: 0.75rem;
@@ -58,12 +54,17 @@
   margin: 0 0 0.65rem;
 }
 
-.sectionBody {
-  font-family: var(--font-body, system-ui), sans-serif;
-  font-size: clamp(0.9rem, 1.2vw, 1rem);
-  line-height: 1.55;
+/* Handwritten trivia — ink on paper feel */
+.triviaHand {
+  margin: 0;
+  max-width: 42rem;
+  font-family: var(--font-hand), "Segoe Script", cursive;
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+  line-height: 1.5;
   color: var(--color-text);
-  max-width: 40rem;
+  letter-spacing: 0.01em;
+  transform: rotate(-0.35deg);
+  text-shadow: 0 0.5px 0 rgba(26, 26, 26, 0.08);
 }
 
 .renditionList {
@@ -94,26 +95,35 @@
   margin-left: 0.25rem;
 }
 
+/* Full-height journal sheet — no box frame, lined paper only */
 .journal {
   position: sticky;
-  top: clamp(1rem, 3vh, 2rem);
-  padding: clamp(1.25rem, 2.5vw, 1.75rem);
-  border-radius: 8px;
-  border: 1px solid rgba(26, 26, 26, 0.12);
-  background-color: #faf8f4;
+  top: clamp(0.75rem, 2vh, 1.25rem);
+  align-self: stretch;
+  min-height: calc(100dvh - 8.5rem);
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1rem, 2.5vw, 1.5rem) clamp(1rem, 2vw, 1.35rem);
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  background-color: #f7f4ee;
   background-image:
-    linear-gradient(rgba(26, 26, 26, 0.06) 1px, transparent 1px);
+    linear-gradient(rgba(26, 26, 26, 0.055) 1px, transparent 1px);
   background-size: 100% 1.5rem;
-  background-position: 0 0.35rem;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+  background-position: 0 0.4rem;
 }
 
 .journalInner {
   position: relative;
   z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
-/* First block in the journal column (e.g. postcard) — avoid double top gap */
+/* First block in the journal column — avoid double top gap */
 .journalInner > *:first-child {
   margin-top: 0;
 }
@@ -122,5 +132,6 @@
   .journal {
     position: relative;
     top: auto;
+    min-height: min(70dvh, 28rem);
   }
 }

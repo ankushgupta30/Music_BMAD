@@ -43,7 +43,10 @@ export default async function SharedEntryPage({ params }: Props) {
   entry = await enrichEntryContext(entry, admin);
 
   return (
-    <main className="min-h-screen" style={{ padding: "var(--margin-x)" }}>
+    <main
+      className="min-h-screen flex flex-col box-border"
+      style={{ padding: "var(--margin-x)", minHeight: "100dvh" }}
+    >
       <EntryDetailShell
         entry={entry}
         backHref={`/share/${token}`}

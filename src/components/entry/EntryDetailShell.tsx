@@ -42,7 +42,7 @@ export default function EntryDetailShell({
   const showRenditions = entry.renditions.length > 0;
 
   return (
-    <>
+    <div className={styles.shell}>
       <Link
         href={backHref}
         className={`font-meta no-underline inline-block mb-8 ${backStyles.backLink}`}
@@ -96,21 +96,14 @@ export default function EntryDetailShell({
             </div>
           )}
 
-          <section className={styles.lyricsPlaceholder} aria-label="Lyrics">
-            <h2 className={styles.lyricsLabel}>Lyrics</h2>
-            <p className={styles.lyricsHint}>
-              Lyrics will appear here in a future release.
-            </p>
-          </section>
-
           <section className={styles.section} aria-labelledby="trivia-heading">
             <h2 id="trivia-heading" className={styles.sectionLabel}>
               Trivia
             </h2>
             {showTrivia ? (
-              <p className={styles.sectionBody}>{entry.trivia_summary}</p>
+              <p className={styles.triviaHand}>{entry.trivia_summary}</p>
             ) : (
-              <p className={styles.lyricsHint}>
+              <p className={styles.hintText}>
                 {entry.context_fetched_at
                   ? "No public write-up found for this track yet."
                   : "Trivia loads from Last.fm when your server has LASTFM_API_KEY set."}
@@ -143,7 +136,7 @@ export default function EntryDetailShell({
                 ))}
               </ul>
             ) : (
-              <p className={styles.lyricsHint}>
+              <p className={styles.hintText}>
                 {entry.context_fetched_at
                   ? "No alternate recordings surfaced for this title (Spotify search)."
                   : "Cover versions and alternate recordings appear when Spotify credentials are configured."}
@@ -156,6 +149,6 @@ export default function EntryDetailShell({
           <div className={styles.journalInner}>{journalColumn}</div>
         </aside>
       </div>
-    </>
+    </div>
   );
 }

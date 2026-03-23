@@ -10,12 +10,15 @@ interface EntryNoteEditorProps {
   entryId: string;
   initialNote: string | null;
   authenticated: boolean;
+  /** Borderless, fills journal sheet on entry detail */
+  variant?: "default" | "journal";
 }
 
 export default function EntryNoteEditor({
   entryId,
   initialNote,
   authenticated,
+  variant = "default",
 }: EntryNoteEditorProps) {
   const [value, setValue] = useState(initialNote ?? "");
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">(
@@ -82,14 +85,18 @@ export default function EntryNoteEditor({
     void flushSave(value);
   };
 
+  const isJournal = variant === "journal";
+
   return (
-    <div className={styles.wrap}>
+    <div
+      className={`${styles.wrap} ${isJournal ? styles.wrapJournal : ""}`.trim()}
+    >
       <label className={styles.label} htmlFor={`note-${entryId}`}>
         Journal
       </label>
       <textarea
         id={`note-${entryId}`}
-        className={styles.textarea}
+        className={`${styles.textarea} ${isJournal ? styles.textareaJournal : ""}`.trim()}
         value={value}
         onChange={onChange}
         onBlur={onBlur}
