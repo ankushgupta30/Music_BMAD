@@ -47,7 +47,11 @@ Optional:
 
 | Name | Value |
 |------|--------|
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role (only if you add server-only features that need it) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role (shared journals / postcards / entry context cache on shared views) |
+| `LASTFM_API_KEY` | [Last.fm API](https://www.last.fm/api/account/create) — powers **Trivia** on entry detail (wiki excerpt) |
+| `SPOTIFY_DEFAULT_MARKET` | ISO country code for catalog search (default `US`) |
+
+Apply Supabase migration `004_entry_context_cache.sql` (or run SQL) so `entries` has `trivia_summary`, `renditions_json`, and `context_fetched_at`.
 
 **Do not** commit `.env.local`. Copy values from your machine into Vercel’s UI.
 

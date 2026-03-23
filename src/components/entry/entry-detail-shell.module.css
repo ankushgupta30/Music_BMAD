@@ -1,0 +1,126 @@
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 380px);
+  gap: clamp(1.75rem, 4vw, 3.5rem);
+  align-items: start;
+  margin-top: clamp(1rem, 3vw, 2rem);
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.left {
+  min-width: 0;
+}
+
+.heroMeta {
+  margin-top: 0.35rem;
+}
+
+.lyricsPlaceholder {
+  margin-top: clamp(1.5rem, 3vw, 2.25rem);
+  padding: 1rem 1.1rem;
+  border-radius: 6px;
+  border: 1px dashed var(--color-text-meta);
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.lyricsLabel {
+  font-family: var(--font-meta), monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-meta);
+  margin: 0 0 0.5rem;
+}
+
+.lyricsHint {
+  margin: 0;
+  font-family: var(--font-meta), monospace;
+  font-size: 0.75rem;
+  color: var(--color-text-meta);
+  line-height: 1.45;
+}
+
+.section {
+  margin-top: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.sectionLabel {
+  font-family: var(--font-meta), monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-meta);
+  margin: 0 0 0.65rem;
+}
+
+.sectionBody {
+  font-family: var(--font-body, system-ui), sans-serif;
+  font-size: clamp(0.9rem, 1.2vw, 1rem);
+  line-height: 1.55;
+  color: var(--color-text);
+  max-width: 40rem;
+}
+
+.renditionList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.renditionList li {
+  margin-bottom: 0.5rem;
+}
+
+.renditionList a {
+  color: var(--color-text);
+  text-decoration: underline;
+  text-decoration-color: var(--color-text-meta);
+  text-underline-offset: 3px;
+}
+
+.renditionList a:hover {
+  text-decoration-color: var(--color-wada-4);
+}
+
+.renditionMeta {
+  font-family: var(--font-meta), monospace;
+  font-size: 0.72rem;
+  color: var(--color-text-meta);
+  margin-left: 0.25rem;
+}
+
+.journal {
+  position: sticky;
+  top: clamp(1rem, 3vh, 2rem);
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+  border-radius: 8px;
+  border: 1px solid rgba(26, 26, 26, 0.12);
+  background-color: #faf8f4;
+  background-image:
+    linear-gradient(rgba(26, 26, 26, 0.06) 1px, transparent 1px);
+  background-size: 100% 1.5rem;
+  background-position: 0 0.35rem;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+}
+
+.journalInner {
+  position: relative;
+  z-index: 1;
+}
+
+/* First block in the journal column (e.g. postcard) — avoid double top gap */
+.journalInner > *:first-child {
+  margin-top: 0;
+}
+
+@media (max-width: 900px) {
+  .journal {
+    position: relative;
+    top: auto;
+  }
+}

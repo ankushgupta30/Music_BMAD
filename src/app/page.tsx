@@ -4,6 +4,7 @@ import IndexShell from "@/components/index/IndexShell";
 import { CURATED_DEMO_ENTRY } from "@/lib/utils/seedData";
 import { createClient } from "@/lib/supabase/server";
 import type { Entry } from "@/types/entry";
+import { mapEntryRow } from "@/lib/utils/mapEntryRow";
 
 /** Index depends on session + DB row count (demo vs empty vs list). */
 export const dynamic = "force-dynamic";
@@ -28,20 +29,9 @@ async function getEntries(): Promise<Entry[]> {
       .order("date_added", { ascending: false });
 
     if (!error && data && data.length > 0) {
-      return data.map((row) => ({
-        id: row.id,
-        spotify_id: row.spotify_id,
-        artist_name: row.artist_name,
-        album_name: row.album_name,
-        song_name: row.song_name || row.album_name,
-        release_year: row.release_year ?? 0,
-        artwork_url: row.artwork_url,
-        note_text: row.note_text,
-        scale_tier: row.scale_tier ?? "medium",
-        hover_color_index: row.hover_color_index ?? 0,
-        date_added: row.date_added,
-        updated_at: row.updated_at,
-      }));
+      return data.map((row) =>
+        mapEntryRow(row as Record<string, unknown>)
+      );
     }
   } catch {
     /* Network / RLS — fall through */

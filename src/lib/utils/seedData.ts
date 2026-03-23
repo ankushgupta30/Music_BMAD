@@ -28,6 +28,9 @@ export const CURATED_DEMO_ENTRY: Entry = {
   hover_color_index: 0,
   date_added: new Date(Date.UTC(2026, 0, 22)).toISOString(),
   updated_at: new Date(Date.UTC(2026, 0, 22)).toISOString(),
+  trivia_summary: null,
+  renditions: [],
+  context_fetched_at: null,
 };
 
 /** Built from `data/songs_raw.txt` via `npm run parse-songs`; years are editorial guesses. */
@@ -47,6 +50,9 @@ export const SEED_ENTRIES: Entry[] = (parsedPairs as ParsedPair[]).map(
       hover_color_index: i % 8,
       date_added: iso,
       updated_at: iso,
+      trivia_summary: null,
+      renditions: [],
+      context_fetched_at: null,
     };
   }
 );

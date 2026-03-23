@@ -130,7 +130,7 @@ export async function searchSpotify(
       };
       return {
         id: track.id,
-        name: album.name,
+        name: (track.name as string) || album.name,
         artist_name: (track.artists as { name: string }[])
           .map((a) => a.name)
           .join(", "),
@@ -147,4 +147,65 @@ export async function searchSpotify(
   }
 
   return [];
+}
+
+export interface SpotifyTrackSearchHit {
+  id: string;
+  track_name: string;
+  artist_name: string;
+  album_name: string;
+}
+
+/** Client-credentials track search; limit 1–50. */
+export async function searchSpotifyTracks(
+  query: string,
+  limit: number = 20
+): Promise<SpotifyTrackSearchHit[]> {
+  const token = await getClientCredentialsToken();
+  const n = typeof limit === "number" && Number.isFinite(limit) ? limit : 20;
+  const safeLimit = Math.min(50, Math.max(1, Math.floor(Math.abs(n))));
+
+  const params = new URLSearchParams({
+    q: query.trim(),
+    type: "track",
+    limit: `${safeLimit}`,
+    offset: "0",
+  });
+  const market = (process.env.SPOTIFY_DEFAULT_MARKET || "US").trim();
+  if (market.toLowerCase() !== "from_token") {
+    params.set("market", market);
+  }
+
+  const url = `${SEARCH_ENDPOINT}?${params.toString()}`;
+  const res = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    if (res.status === 401) {
+      cachedToken = null;
+      throw new Error("Spotify token expired. Retry.");
+    }
+    console.error("[spotify] track search failed", res.status);
+    throw new Error(`Spotify track search failed: ${res.status}`);
+  }
+
+  const data = await res.json();
+  const items = data.tracks?.items as Record<string, unknown>[] | undefined;
+  if (!items?.length) return [];
+
+  return items.map((track) => {
+    const album = track.album as { name?: string };
+    return {
+      id: String(track.id),
+      track_name: String(track.name ?? ""),
+      artist_name: (track.artists as { name: string }[] | undefined)
+        ?.map((a) => a.name)
+        .join(", ") ?? "",
+      album_name: String(album?.name ?? ""),
+    };
+  });
 }
