@@ -29,8 +29,34 @@
   min-width: 0;
 }
 
+.cluster {
+  display: flex;
+  flex-direction: column;
+}
+
 .heroMeta {
   margin-top: 0.35rem;
+}
+
+.paperSheet,
+.paperCard {
+  position: relative;
+  background: #f7f4ee;
+  box-shadow:
+    0 1px 0 rgba(26, 26, 26, 0.06),
+    0 10px 24px rgba(26, 26, 26, 0.08);
+}
+
+.paperSheet {
+  padding: clamp(1.2rem, 2.2vw, 1.8rem);
+}
+
+.paperCard {
+  padding: clamp(0.95rem, 2vw, 1.3rem);
+}
+
+.heroGroup {
+  margin-top: 0.2rem;
 }
 
 .hintText {
@@ -57,14 +83,52 @@
 /* Handwritten trivia — ink on paper feel */
 .triviaHand {
   margin: 0;
-  max-width: 42rem;
+  max-width: 40rem;
   font-family: var(--font-hand), "Segoe Script", cursive;
   font-size: clamp(1.15rem, 2vw, 1.45rem);
   line-height: 1.5;
   color: var(--color-text);
   letter-spacing: 0.01em;
-  transform: rotate(-0.35deg);
+  transform: rotate(-0.25deg);
   text-shadow: 0 0.5px 0 rgba(26, 26, 26, 0.08);
+}
+
+.postIt {
+  position: relative;
+  margin-top: 0.25rem;
+  padding: 0.9rem 1rem 1rem;
+  max-width: min(100%, 38rem);
+}
+
+.postIt::after {
+  content: "";
+  position: absolute;
+  width: 0.95rem;
+  height: 0.95rem;
+  top: -0.35rem;
+  right: 1rem;
+  border-radius: 9999px;
+  background: rgba(26, 26, 26, 0.17);
+  box-shadow: 0 1px 1px rgba(26, 26, 26, 0.18);
+}
+
+.postItYellow {
+  background: #f7e49e;
+  transform: rotate(-1.1deg);
+}
+
+.postItBlue {
+  background: #dce8f5;
+  transform: rotate(0.8deg);
+}
+
+.postItPeach {
+  background: #f3d8c6;
+  transform: rotate(-0.7deg);
+}
+
+.pinShadow {
+  overflow: visible;
 }
 
 .renditionList {
@@ -133,5 +197,9 @@
     position: relative;
     top: auto;
     min-height: min(70dvh, 28rem);
+  }
+
+  .postIt {
+    max-width: 100%;
   }
 }

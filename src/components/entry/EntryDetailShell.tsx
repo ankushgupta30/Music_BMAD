@@ -40,6 +40,7 @@ export default function EntryDetailShell({
   const showTrivia =
     entry.trivia_summary != null && entry.trivia_summary.trim().length > 0;
   const showRenditions = entry.renditions.length > 0;
+  const postItVariant = showTrivia ? styles.postItYellow : styles.postItBlue;
 
   return (
     <div className={styles.shell}>
@@ -51,68 +52,75 @@ export default function EntryDetailShell({
       </Link>
 
       <div className={styles.grid}>
-        <div className={styles.left}>
-          <h1
-            className="font-display text-dotted"
-            style={{
-              fontSize: "var(--type-large)",
-              color: "var(--color-text)",
-              ["--dotted-ink" as string]: "var(--color-text)",
-            }}
-          >
-            {entry.artist_name}
-          </h1>
-
-          <p
-            className={`font-meta ${styles.heroMeta}`}
-            style={{
-              fontSize: "var(--type-meta)",
-              color: "var(--color-text-meta)",
-            }}
-          >
-            {entry.album_name} · {entry.song_name}
-            {entry.release_year > 0 ? ` · ${entry.release_year}` : ""}
-          </p>
-
-          {addedLabel && (
-            <p
-              className="font-meta mt-1"
+        <div className={`${styles.left} ${styles.cluster}`}>
+          <section className={`${styles.paperSheet} ${styles.heroGroup}`}>
+            <h1
+              className="font-display text-dotted"
               style={{
-                fontSize: "clamp(0.65rem, 1.5vw, 0.8rem)",
-                color: "var(--color-text-meta)",
-                letterSpacing: "0.06em",
+                fontSize: "var(--type-large)",
+                color: "var(--color-text)",
+                ["--dotted-ink" as string]: "var(--color-text)",
               }}
             >
-              Added {addedLabel}
+              {entry.artist_name}
+            </h1>
+
+            <p
+              className={`font-meta ${styles.heroMeta}`}
+              style={{
+                fontSize: "var(--type-meta)",
+                color: "var(--color-text-meta)",
+              }}
+            >
+              {entry.album_name} · {entry.song_name}
+              {entry.release_year > 0 ? ` · ${entry.release_year}` : ""}
             </p>
-          )}
 
-          {entry.artwork_url && (
-            <div className="mt-8">
-              <InteractiveEntryArtwork
-                src={entry.artwork_url}
-                alt={`${entry.album_name} album artwork`}
-              />
-            </div>
-          )}
-
-          <section className={styles.section} aria-labelledby="trivia-heading">
-            <h2 id="trivia-heading" className={styles.sectionLabel}>
-              Trivia
-            </h2>
-            {showTrivia ? (
-              <p className={styles.triviaHand}>{entry.trivia_summary}</p>
-            ) : (
-              <p className={styles.hintText}>
-                {entry.context_fetched_at
-                  ? "No public write-up found for this track yet."
-                  : "Trivia loads from Last.fm when your server has LASTFM_API_KEY set."}
+            {addedLabel && (
+              <p
+                className="font-meta mt-1"
+                style={{
+                  fontSize: "clamp(0.65rem, 1.5vw, 0.8rem)",
+                  color: "var(--color-text-meta)",
+                  letterSpacing: "0.06em",
+                }}
+              >
+                Added {addedLabel}
               </p>
+            )}
+
+            {entry.artwork_url && (
+              <div className="mt-8">
+                <InteractiveEntryArtwork
+                  src={entry.artwork_url}
+                  alt={`${entry.album_name} album artwork`}
+                />
+              </div>
             )}
           </section>
 
           <section
-            className={styles.section}
+            className={`${styles.paperCard} ${styles.section} ${styles.pinShadow}`}
+            aria-labelledby="trivia-heading"
+          >
+            <h2 id="trivia-heading" className={styles.sectionLabel}>
+              Trivia
+            </h2>
+            <div className={`${styles.postIt} ${postItVariant}`}>
+              {showTrivia ? (
+                <p className={styles.triviaHand}>{entry.trivia_summary}</p>
+              ) : (
+                <p className={styles.hintText}>
+                  {entry.context_fetched_at
+                    ? "No public write-up found for this track yet."
+                    : "Trivia loads from Last.fm when your server has LASTFM_API_KEY set."}
+                </p>
+              )}
+            </div>
+          </section>
+
+          <section
+            className={`${styles.paperCard} ${styles.section}`}
             aria-labelledby="renditions-heading"
           >
             <h2 id="renditions-heading" className={styles.sectionLabel}>
