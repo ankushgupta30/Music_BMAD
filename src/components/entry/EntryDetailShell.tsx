@@ -112,7 +112,7 @@ export default function EntryDetailShell({
                   <p className={styles.hintText}>
                     {entry.context_fetched_at
                       ? "No public write-up found for this track yet."
-                      : "Trivia loads from Last.fm when your server has LASTFM_API_KEY set."}
+                      : "No public write-up found for this track yet."}
                   </p>
                 )}
               </div>
