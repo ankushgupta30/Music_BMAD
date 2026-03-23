@@ -11,10 +11,10 @@ export default function SharedJournalShell({
       <aside className={shellStyles.sidebar} aria-label="Rewind">
         <span className={shellStyles.logo}>Rewind</span>
       </aside>
-      <div className={shellStyles.main}>
+      <main className={shellStyles.main}>
         <p className={sharedStyles.banner}>Shared with you</p>
         {children}
-      </div>
+      </main>
     </div>
   );
 }

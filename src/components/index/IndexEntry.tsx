@@ -12,6 +12,8 @@ interface IndexEntryProps {
   hoverColorIndex: number;
   /** Base path without trailing slash, e.g. `/entry` or `/share/TOKEN/entry` */
   entryHrefBase?: string;
+  /** Duplicate horizontal copies set false so tab order visits each entry once (Story 1.8). */
+  includeInTabOrder?: boolean;
 }
 
 export default function IndexEntry({
@@ -21,6 +23,7 @@ export default function IndexEntry({
   releaseYear,
   hoverColorIndex,
   entryHrefBase = "/entry",
+  includeInTabOrder = true,
 }: IndexEntryProps) {
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -40,9 +43,11 @@ export default function IndexEntry({
   return (
     <Link
       href={`${entryHrefBase}/${id}`}
+      prefetch
       className={`font-display no-underline indexArtistLink ${
         active ? "" : "text-dotted"
       }`}
+      tabIndex={includeInTabOrder ? undefined : -1}
       title={artistName}
       style={{
         color: wadaColor,

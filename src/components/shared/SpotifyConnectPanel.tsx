@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { isSupabaseConfigured, createClient } from "@/lib/supabase/client";
 import SearchPanel from "@/components/search/SearchPanel";
 import JournalShareSection from "@/components/shared/JournalShareSection";
@@ -21,6 +21,7 @@ export default function SpotifyConnectPanel({
   connected,
   layout = "modal",
 }: SpotifyConnectPanelProps) {
+  const panelRootRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [syncing, setSyncing] = useState(false);
@@ -34,6 +35,20 @@ export default function SpotifyConnectPanel({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
+
+  /** Move focus into the panel when it opens (dock + modal); Escape still closes via handler above. */
+  useEffect(() => {
+    if (!open) return;
+    const t = window.setTimeout(() => {
+      const root = panelRootRef.current;
+      if (!root) return;
+      const focusable = root.querySelector<HTMLElement>(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      focusable?.focus();
+    }, 50);
+    return () => window.clearTimeout(t);
+  }, [open]);
 
   const connect = useCallback(async () => {
     if (!isSupabaseConfigured) {
@@ -118,6 +133,8 @@ export default function SpotifyConnectPanel({
 
   const inner = (
     <div
+      ref={panelRootRef}
+      id="spotify-panel-root"
       className={panelClass}
       role="dialog"
       aria-modal={layout === "modal"}

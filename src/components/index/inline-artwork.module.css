@@ -10,6 +10,11 @@
   overflow: visible;
 }
 
+/* Large hover/scroll scale — keep cover above neighbors */
+.artLinkElevated {
+  z-index: 12;
+}
+
 .artLink:focus-visible {
   outline: 2px solid var(--color-wada-4);
   outline-offset: 4px;
@@ -23,4 +28,25 @@
   height: 100%;
   object-fit: cover;
   border-radius: 2px;
+}
+
+/* WCAG-style minimum touch target; visual thumb stays em-sized, centered in larger box */
+@media (pointer: coarse) {
+  .artLink {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    width: max(calc(var(--artwork-index-em, 1.02) * 1em), 44px);
+    height: max(calc(var(--artwork-index-em, 1.02) * 1em), 44px);
+  }
+
+  .imgStatic,
+  .imgMotion {
+    width: calc(var(--artwork-index-em, 1.02) * 1em);
+    height: calc(var(--artwork-index-em, 1.02) * 1em);
+    max-width: min(100%, calc(var(--artwork-index-em, 1.02) * 1em));
+    max-height: min(100%, calc(var(--artwork-index-em, 1.02) * 1em));
+  }
 }

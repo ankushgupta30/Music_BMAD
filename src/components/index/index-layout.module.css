@@ -56,6 +56,7 @@
   align-items: center;
   gap: var(--gap-tapestry-inline);
   padding-inline-start: 0;
+  overflow: visible;
 }
 
 /* Own rule (not chained) so CSS Modules always emit it for odd rows */
@@ -69,11 +70,48 @@
   flex-direction: row;
   align-items: center;
   flex-shrink: 0;
-  font-size: var(--type-index);
+  font-size: var(--type-index-medium);
   padding-block: 0;
   margin-inline-end: 0.15em;
   scroll-snap-align: start;
   line-height: 1.08;
+  overflow: visible;
+}
+
+.entryUnit[data-scale-tier="large"] {
+  font-size: var(--type-index-large);
+}
+
+.entryUnit[data-scale-tier="medium"] {
+  font-size: var(--type-index-medium);
+}
+
+.entryUnit[data-scale-tier="small"] {
+  font-size: var(--type-index-small);
+}
+
+/* Scroll-linked affordance (IntersectionObserver sets data-scroll-active in IndexLayout) */
+.entryUnit .metaStack {
+  opacity: 0.78;
+}
+
+.entryUnit[data-scroll-active="true"] .coverMeta {
+  transform: translateY(-0.07em);
+  filter: drop-shadow(0 6px 14px rgba(26, 26, 26, 0.08));
+}
+
+.entryUnit[data-scroll-active="true"] .metaStack {
+  opacity: 1;
+  transform: translateX(0.04em);
+}
+
+.entryUnit :global(a.indexArtistLink) {
+  transition: opacity 200ms ease-out;
+  opacity: 0.9;
+}
+
+.entryUnit[data-scroll-active="true"] :global(a.indexArtistLink) {
+  opacity: 1;
 }
 
 .artistCell {
@@ -90,6 +128,9 @@
   flex-shrink: 0;
   gap: 0.12em;
   padding-left: var(--cover-meta-pl);
+  transition:
+    transform 220ms var(--ease-out, ease-out),
+    filter 220ms var(--ease-out, ease-out);
 }
 
 .metaStack {
@@ -99,6 +140,34 @@
   line-height: 1.2;
   text-align: left;
   max-width: 14em;
+  transition:
+    opacity 220ms var(--ease-out, ease-out),
+    transform 220ms var(--ease-out, ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coverMeta,
+  .metaStack {
+    transition: none;
+  }
+
+  .entryUnit :global(a.indexArtistLink) {
+    transition: none;
+    opacity: 1;
+  }
+
+  .entryUnit .metaStack {
+    opacity: 1;
+  }
+
+  .entryUnit[data-scroll-active="true"] .coverMeta {
+    transform: none;
+    filter: none;
+  }
+
+  .entryUnit[data-scroll-active="true"] .metaStack {
+    transform: none;
+  }
 }
 
 /* Hierarchy: meta scales with display (em) but never below readable floor token */
