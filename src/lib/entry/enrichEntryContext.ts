@@ -3,6 +3,7 @@ import { fetchLastFmTrackWikiSummary, isLastFmConfigured } from "@/lib/lastfm/tr
 import { fetchRenditionsForEntry } from "@/lib/spotify/renditions";
 import { isSpotifyConfigured } from "@/lib/spotify/client";
 import { fetchRedditTriviaItems } from "@/lib/reddit/trivia";
+import { fetchWikiTriviaItems } from "@/lib/wiki/trivia";
 import type { Entry, EntryRendition, EntryTriviaItem } from "@/types/entry";
 
 const CONTEXT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -63,6 +64,17 @@ export async function enrichEntryContext(
         if (existing.has(key)) continue;
         triviaItems.push(item);
         existing.add(key);
+      }
+    }
+
+    if (triviaItems.length === 0) {
+      const wikiItems = await fetchWikiTriviaItems(
+        entry.artist_name,
+        entry.song_name || entry.album_name
+      );
+      if (wikiItems.length > 0) {
+        triviaItems = wikiItems;
+        trivia = wikiItems[0]?.text ?? trivia;
       }
     }
 
