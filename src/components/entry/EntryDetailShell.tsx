@@ -79,6 +79,11 @@ function sourceLabel(kind: Entry["trivia_items"][number]["source_type"]): string
   }
 }
 
+function extractSubreddit(text: string): string | null {
+  const m = text.match(/\br\/([a-z0-9_]+)/i);
+  return m?.[1] ?? null;
+}
+
 export default function EntryDetailShell({
   entry,
   backHref,
@@ -90,6 +95,8 @@ export default function EntryDetailShell({
     (a, b) => triviaRankScore(b) - triviaRankScore(a)
   );
   const displayTrivia = rankedTrivia.slice(0, MAX_TRIVIA_BLOCKS);
+  const redditItems = displayTrivia.filter((i) => i.source_type === "reddit");
+  const topSubreddit = extractSubreddit(redditItems[0]?.text ?? "");
   const fallbackTrivia =
     entry.trivia_summary && entry.trivia_summary.trim().length > 0
       ? entry.trivia_summary
@@ -163,7 +170,9 @@ export default function EntryDetailShell({
               <div className={`${styles.postIt} ${styles.postItPeach}`}>
                 <p className={styles.postItMeta}>from listeners</p>
                 <p className={styles.postItMetaLine}>
-                  {entry.song_name} · {entry.release_year > 0 ? entry.release_year : "unknown year"}
+                  {redditItems.length > 0
+                    ? `${redditItems.length} thread note${redditItems.length > 1 ? "s" : ""}${topSubreddit ? ` · r/${topSubreddit}` : ""}`
+                    : "still digging for listener takes"}
                 </p>
               </div>
               {showStructured ? (

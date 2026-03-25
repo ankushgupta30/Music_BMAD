@@ -7,17 +7,11 @@ const MAX_THREADS_FOR_COMMENTS = 6;
 const MAX_COMMENTS_PER_THREAD = 10;
 const SNIPPET_MAX = 420;
 
-const SUBREDDIT_ALLOWLIST = new Set([
-  "music",
-  "letstalkmusic",
-  "songwriting",
-  "hiphopheads",
-  "popheads",
-  "indieheads",
-  "listentothis",
-  "ifyoulikeblank",
-  "musicrecommendations",
-]);
+/**
+ * Keep broad coverage: community context matters and many songs surface in
+ * artist-specific or niche subreddits.
+ */
+const SUBREDDIT_ALLOWLIST = new Set<string>();
 
 type SearchPost = {
   id: string;
@@ -382,7 +376,7 @@ export async function fetchRedditTriviaItems(artist: string, song: string): Prom
 
     const combined = `${title} ${selftext}`.trim();
     const tokenHits = countTokenHits(combined, requiredTokens);
-    if (tokenHits < Math.min(2, requiredTokens.length)) continue;
+    if (tokenHits < Math.min(1, requiredTokens.length)) continue;
 
     const ups = typeof p.ups === "number" ? p.ups : 0;
     const comments = typeof p.num_comments === "number" ? p.num_comments : 0;

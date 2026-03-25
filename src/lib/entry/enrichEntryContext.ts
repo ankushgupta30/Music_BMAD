@@ -7,12 +7,17 @@ import { fetchWikiTriviaItems } from "@/lib/wiki/trivia";
 import type { Entry, EntryRendition, EntryTriviaItem } from "@/types/entry";
 
 const CONTEXT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+const NO_REDDIT_RETRY_MS = 24 * 60 * 60 * 1000;
 
 function isContextFresh(entry: Entry): boolean {
   if (!entry.context_fetched_at) return false;
   const t = Date.parse(entry.context_fetched_at);
   if (Number.isNaN(t)) return false;
-  return Date.now() - t < CONTEXT_TTL_MS;
+  const age = Date.now() - t;
+  if (age >= CONTEXT_TTL_MS) return false;
+  const hasRedditItem = (entry.trivia_items ?? []).some((i) => i.source_type === "reddit");
+  if (!hasRedditItem && age >= NO_REDDIT_RETRY_MS) return false;
+  return true;
 }
 
 /** Local / demo entries are not stored in Supabase. */
