@@ -110,16 +110,17 @@
   text-underline-offset: 2px;
 }
 
-.triviaList {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(1rem, 2.5vw, 1.35rem);
+.triviaCardWrap {
+  max-width: min(100%, 38rem);
 }
 
 .postItStack {
   position: relative;
-  min-height: 9.5rem;
+  min-height: 0;
   margin-top: 0.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.1rem, 2.8vw, 1.5rem);
 }
 
 .postIt {
@@ -150,6 +151,27 @@
   transform: rotate(-1.4deg);
 }
 
+/* Alternate “sticky note” colors for separate trivia cards */
+.postItMint {
+  background: #c5e6d4;
+  transform: rotate(1.15deg);
+}
+
+.postItApricot {
+  background: #f2d2a6;
+  transform: rotate(-0.85deg);
+}
+
+.postItLime {
+  background: #dde8a0;
+  transform: rotate(-1.05deg);
+}
+
+.postItLavender {
+  background: #d8cef0;
+  transform: rotate(0.95deg);
+}
+
 .postItBlue {
   background: #d5e5f5;
   transform: rotate(1deg);
@@ -159,11 +181,11 @@
   background: #f3d0bd;
   width: min(72%, 22rem);
   transform: rotate(2.2deg);
-  position: absolute;
-  right: 0.35rem;
-  top: -0.1rem;
-  z-index: 0;
+  position: relative;
+  align-self: flex-end;
+  z-index: 1;
   opacity: 0.95;
+  margin-bottom: 0.15rem;
 }
 
 .postItMeta {
@@ -259,10 +281,8 @@
   }
 
   .postItPeach {
-    position: relative;
     width: min(100%, 20rem);
-    right: auto;
-    top: auto;
+    align-self: flex-start;
     margin-bottom: 0.35rem;
   }
 }

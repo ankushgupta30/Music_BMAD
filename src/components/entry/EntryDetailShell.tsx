@@ -41,6 +41,27 @@ function triviaRankScore(item: Entry["trivia_items"][number]): number {
   return (item.score ?? 0) + 1;
 }
 
+const REDDIT_POST_IT_SURFACES = [
+  styles.postItYellow,
+  styles.postItMint,
+  styles.postItApricot,
+  styles.postItLime,
+] as const;
+
+function postItSurface(
+  item: Entry["trivia_items"][number],
+  redditIndex: number
+): string {
+  if (item.source_type === "reddit") {
+    return (
+      REDDIT_POST_IT_SURFACES[redditIndex % REDDIT_POST_IT_SURFACES.length] ??
+      styles.postItYellow
+    );
+  }
+  if (item.source_type === "wiki") return styles.postItLavender;
+  return styles.postItBlue;
+}
+
 function sourceLabel(kind: Entry["trivia_items"][number]["source_type"]): string {
   switch (kind) {
     case "lastfm":
@@ -75,8 +96,7 @@ export default function EntryDetailShell({
       : null;
   const showStructured = displayTrivia.length > 0;
   const showLegacyFallback = !showStructured && Boolean(fallbackTrivia?.trim());
-  const showTrivia = showStructured || showLegacyFallback;
-  const postItVariant = showTrivia ? styles.postItYellow : styles.postItBlue;
+  let redditOrdinal = 0;
 
   return (
     <div className={styles.shell}>
@@ -137,20 +157,30 @@ export default function EntryDetailShell({
 
           <section
             className={`${styles.paperCard} ${styles.section} ${styles.pinShadow}`}
-            aria-label="Trivia"
+            aria-label="Listener notes and reference"
           >
             <div className={styles.postItStack}>
               <div className={`${styles.postIt} ${styles.postItPeach}`}>
-                <p className={styles.postItMeta}>archive note</p>
+                <p className={styles.postItMeta}>from listeners</p>
                 <p className={styles.postItMetaLine}>
                   {entry.song_name} · {entry.release_year > 0 ? entry.release_year : "unknown year"}
                 </p>
               </div>
-              <div className={`${styles.postIt} ${postItVariant}`}>
-                {showStructured ? (
-                  <div className={styles.triviaList}>
-                    {displayTrivia.map((item, i) => (
-                      <div key={`${item.source_type}-${item.fetched_at}-${i}`}>
+              {showStructured ? (
+                displayTrivia.map((item, i) => {
+                  const surfaceClass = postItSurface(
+                    item,
+                    item.source_type === "reddit" ? redditOrdinal++ : 0
+                  );
+                  return (
+                    <div
+                      key={`${item.source_type}-${item.fetched_at}-${i}`}
+                      className={styles.triviaCardWrap}
+                      style={{
+                        alignSelf: i % 2 === 1 ? "flex-end" : "flex-start",
+                      }}
+                    >
+                      <div className={`${styles.postIt} ${surfaceClass}`}>
                         <p className={styles.triviaHand}>{item.text.trim()}</p>
                         <p className={styles.triviaSource}>
                           Source: {sourceLabel(item.source_type)}
@@ -162,22 +192,36 @@ export default function EntryDetailShell({
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
-                                open
+                                open thread
                               </a>
                             </>
                           ) : null}
                         </p>
                       </div>
-                    ))}
+                    </div>
+                  );
+                })
+              ) : showLegacyFallback ? (
+                <div
+                  className={styles.triviaCardWrap}
+                  style={{ alignSelf: "flex-start" }}
+                >
+                  <div className={`${styles.postIt} ${styles.postItYellow}`}>
+                    <p className={styles.triviaHand}>{fallbackTrivia}</p>
                   </div>
-                ) : showLegacyFallback ? (
-                  <p className={styles.triviaHand}>{fallbackTrivia}</p>
-                ) : (
-                  <p className={styles.hintText}>
-                    No discussion threads or listener notes surfaced for this track yet.
-                  </p>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div
+                  className={styles.triviaCardWrap}
+                  style={{ alignSelf: "flex-start" }}
+                >
+                  <div className={`${styles.postIt} ${styles.postItBlue}`}>
+                    <p className={styles.hintText}>
+                      No discussion threads or listener notes surfaced for this track yet.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </section>
         </div>

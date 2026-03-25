@@ -37,10 +37,16 @@ function countTokenHits(text: string, tokens: string[]): number {
 
 /** Favor posts that read like opinions, stories, or discussion — not promo drops. */
 const DISCUSSION_RE =
-  /\b(thoughts?|opinion|feel|feels|feeling|discuss|discussion|interpretation|meaning|underrated|overrated|favorite|favourite|recommend|relat(e|es|ed)|memory|memories|cry|cried|goosebumps|hits different|personally|honestly|anyone else|unpopular|hot take|learned|realize|realised|why i love|changed my life|first time i|reminds me|nostalgia|depress|happy when|connect with)\b/i;
+  /\b(thoughts?|opinion|feel|feels|feeling|discuss|discussion|interpretation|meaning|underrated|overrated|favorite|favourite|recommend|relat(e|es|ed)|memory|memories|cry|cried|goosebumps|hits different|personally|honestly|anyone else|unpopular|hot take|learned|realize|realised|why i love|changed my life|first time i|reminds me|nostalgia|depress|happy when|connect with|essay|deep dive|reference(s)? behind|breakdown|analysis)\b/i;
+
+/** Casual / personal voice (comments, rants, strong takes). */
+const OPINION_RE =
+  /\b(imo|in my opinion|i think|i feel|i wish|i love|i hate|i don't|i do not|i cant|i can't|makes me|we should|really wish|slaps?|\bmid\b|bloat|bloated|normalize|real talk|rant|vibes?|unfiltered|biased|pad(s|ded|ding)?|shit out|don't pad|short album|deluxe)\b/i;
 
 const NEWSY_TITLE_RE =
   /\b(official\s*(music\s*)?video|music\s*video|\bmv\b|out now|streaming now|premiere|drops tonight|visualizer|lyric video|audio only|spotify|apple music)\b/i;
+
+const SNIPPET_MAX = 560;
 
 function cleanSelftext(raw: string): string {
   return raw
@@ -49,26 +55,51 @@ function cleanSelftext(raw: string): string {
     .trim();
 }
 
+function firstSentences(text: string, maxSentences: number, maxChars: number): string {
+  const parts = text.split(/(?<=[.!?])\s+/).filter(Boolean);
+  let out = "";
+  for (let i = 0; i < Math.min(maxSentences, parts.length); i++) {
+    const next = out ? `${out} ${parts[i]}` : parts[i];
+    if (next.length > maxChars) break;
+    out = next;
+  }
+  return out.trim();
+}
+
 function buildSnippet(title: string, selftext: string): string {
   const plain = cleanSelftext(selftext);
   const t = title.trim();
-  if (!plain) return t;
-  if (plain.length >= 140) {
-    const parts = plain.split(/(?<=[.!?])\s+/).filter(Boolean);
-    const two = parts.slice(0, 2).join(" ");
-    if (two.length >= 72) return two.slice(0, 320).trim();
+  if (!plain) return t.slice(0, SNIPPET_MAX).trim();
+
+  if (plain.length >= 360) {
+    const chunk = firstSentences(plain, 5, SNIPPET_MAX);
+    if (chunk.length >= 120) return chunk;
   }
+  if (plain.length >= 220) {
+    const chunk = firstSentences(plain, 4, SNIPPET_MAX);
+    if (chunk.length >= 100) return chunk;
+  }
+  if (plain.length >= 120) {
+    const chunk = firstSentences(plain, 3, SNIPPET_MAX);
+    if (chunk.length >= 72) return chunk;
+  }
+  if (plain.length >= 72) {
+    const chunk = firstSentences(plain, 2, SNIPPET_MAX);
+    if (chunk.length >= 56) return chunk;
+  }
+
   const sentence = plain.split(/[.!?]\s+/)[0]?.trim() || plain;
   const merged = sentence.length >= 72 ? sentence : `${t} — ${sentence}`;
-  return merged.slice(0, 320).trim();
+  return merged.slice(0, SNIPPET_MAX).trim();
 }
 
 function discussionBoost(combined: string): number {
   let b = 0;
   const hay = normalize(combined);
   if (DISCUSSION_RE.test(combined)) b += 45;
+  if (OPINION_RE.test(combined)) b += 38;
   if (combined.includes("?")) b += 12;
-  if (/\b(i|i'm|i've|we|my|me)\b/i.test(combined)) b += 18;
+  if (/\b(i|i'm|i've|we|my|me)\b/i.test(combined)) b += 22;
   if (hay.includes(" song ") || hay.endsWith(" song")) b += 4;
   return b;
 }
@@ -182,10 +213,18 @@ export async function fetchRedditTriviaItems(
 
     if (looksPromoOnly(title, selftext)) continue;
 
+    const firstPerson = /\b(i|i'm|i've|we|my|me)\b/i.test(combined);
+    const titleLooksOpinion =
+      bodyLen < 36 &&
+      title.length >= 26 &&
+      (OPINION_RE.test(title) || DISCUSSION_RE.test(title) || /\b(imo|thoughts|\?)\b/i.test(title));
+
     const hasSubstance =
       bodyLen >= 56 ||
       (DISCUSSION_RE.test(combined) && bodyLen >= 28) ||
+      (OPINION_RE.test(combined) && firstPerson && bodyLen >= 22) ||
       (title.includes("?") && bodyLen >= 20) ||
+      titleLooksOpinion ||
       comments >= 12;
 
     if (!hasSubstance) continue;
@@ -195,9 +234,10 @@ export async function fetchRedditTriviaItems(
       discussionBoost(combined) +
       Math.log10(Math.max(1, ups + 1)) * 4 +
       Math.log10(Math.max(1, comments + 1)) * 14 +
-      Math.min(bodyLen, 400) * 0.06;
+      Math.min(bodyLen, 900) * 0.07;
 
-    if (bodyLen < 40) score -= 22;
+    if (bodyLen < 40) score -= 18;
+    if (bodyLen >= 280) score += 28;
 
     const text = buildSnippet(title, selftext);
     if (!text || text.length < 28) continue;
