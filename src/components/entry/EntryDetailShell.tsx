@@ -26,6 +26,16 @@ interface EntryDetailShellProps {
   journalColumn: ReactNode;
 }
 
+const MAX_TRIVIA_BLOCKS = 6;
+
+/** Order: Last.fm lead, then Reddit by score, then Wiki, then other. */
+function triviaRankScore(item: Entry["trivia_items"][number]): number {
+  if (item.score != null) return item.score;
+  if (item.source_type === "lastfm") return 1_000_000;
+  if (item.source_type === "wiki") return 500_000;
+  return 0;
+}
+
 function sourceLabel(kind: Entry["trivia_items"][number]["source_type"]): string {
   switch (kind) {
     case "lastfm":
@@ -51,15 +61,16 @@ export default function EntryDetailShell({
 }: EntryDetailShellProps) {
   const addedLabel = formatAddedAt(entry.date_added);
   const rankedTrivia = [...(entry.trivia_items ?? [])].sort(
-    (a, b) => (b.score ?? -Infinity) - (a.score ?? -Infinity)
+    (a, b) => triviaRankScore(b) - triviaRankScore(a)
   );
-  const topTrivia = rankedTrivia[0] ?? null;
+  const displayTrivia = rankedTrivia.slice(0, MAX_TRIVIA_BLOCKS);
   const fallbackTrivia =
     entry.trivia_summary && entry.trivia_summary.trim().length > 0
       ? entry.trivia_summary
       : null;
-  const triviaText = topTrivia?.text?.trim() || fallbackTrivia;
-  const showTrivia = Boolean(triviaText && triviaText.length > 0);
+  const showStructured = displayTrivia.length > 0;
+  const showLegacyFallback = !showStructured && Boolean(fallbackTrivia?.trim());
+  const showTrivia = showStructured || showLegacyFallback;
   const postItVariant = showTrivia ? styles.postItYellow : styles.postItBlue;
 
   return (
@@ -131,27 +142,31 @@ export default function EntryDetailShell({
                 </p>
               </div>
               <div className={`${styles.postIt} ${postItVariant}`}>
-                {showTrivia ? (
-                  <>
-                    <p className={styles.triviaHand}>{triviaText}</p>
-                    {topTrivia ? (
-                      <p className={styles.triviaSource}>
-                        Source: {sourceLabel(topTrivia.source_type)}
-                        {topTrivia.source_url ? (
-                          <>
-                            {" · "}
-                            <a
-                              href={topTrivia.source_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              open
-                            </a>
-                          </>
-                        ) : null}
-                      </p>
-                    ) : null}
-                  </>
+                {showStructured ? (
+                  <div className={styles.triviaList}>
+                    {displayTrivia.map((item, i) => (
+                      <div key={`${item.source_type}-${item.fetched_at}-${i}`}>
+                        <p className={styles.triviaHand}>{item.text.trim()}</p>
+                        <p className={styles.triviaSource}>
+                          Source: {sourceLabel(item.source_type)}
+                          {item.source_url ? (
+                            <>
+                              {" · "}
+                              <a
+                                href={item.source_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                open
+                              </a>
+                            </>
+                          ) : null}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : showLegacyFallback ? (
+                  <p className={styles.triviaHand}>{fallbackTrivia}</p>
                 ) : (
                   <p className={styles.hintText}>No public write-up found for this track yet.</p>
                 )}

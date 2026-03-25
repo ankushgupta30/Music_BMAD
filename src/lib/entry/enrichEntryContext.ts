@@ -67,14 +67,17 @@ export async function enrichEntryContext(
       }
     }
 
-    if (triviaItems.length === 0) {
-      const wikiItems = await fetchWikiTriviaItems(
-        entry.artist_name,
-        entry.song_name || entry.album_name
-      );
-      if (wikiItems.length > 0) {
-        triviaItems = wikiItems;
-        trivia = wikiItems[0]?.text ?? trivia;
+    const wikiItems = await fetchWikiTriviaItems(
+      entry.artist_name,
+      entry.song_name || entry.album_name
+    );
+    if (wikiItems.length > 0) {
+      const existing = new Set(triviaItems.map((item) => item.text.trim().toLowerCase()));
+      for (const item of wikiItems) {
+        const key = item.text.trim().toLowerCase();
+        if (existing.has(key)) continue;
+        triviaItems.push(item);
+        existing.add(key);
       }
     }
 
