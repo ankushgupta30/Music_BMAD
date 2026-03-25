@@ -2,7 +2,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { fetchLastFmTrackWikiSummary, isLastFmConfigured } from "@/lib/lastfm/trackWiki";
 import { fetchRenditionsForEntry } from "@/lib/spotify/renditions";
 import { isSpotifyConfigured } from "@/lib/spotify/client";
-import { fetchRedditTriviaItems } from "@/lib/reddit/trivia";
+import { fetchRedditTriviaItems, fetchRedditTriviaItemsDebug } from "@/lib/reddit/trivia";
+import type { RedditTriviaDebugReport } from "@/lib/reddit/trivia";
 import { fetchWikiTriviaItems } from "@/lib/wiki/trivia";
 import type { Entry, EntryRendition, EntryTriviaItem } from "@/types/entry";
 
@@ -156,4 +157,155 @@ export async function enrichEntryContext(
     renditions,
     context_fetched_at: fetchedAt,
   };
+}
+
+function isPersistableTriviaItem(item: EntryTriviaItem): boolean {
+  if (!item || typeof item !== "object") return false;
+  if (typeof item.text !== "string" || item.text.trim().length === 0) return false;
+  if (
+    item.source_type !== "lastfm" &&
+    item.source_type !== "reddit" &&
+    item.source_type !== "wiki" &&
+    item.source_type !== "interview" &&
+    item.source_type !== "editorial" &&
+    item.source_type !== "other"
+  ) {
+    return false;
+  }
+  if (typeof item.fetched_at !== "string" || item.fetched_at.trim().length === 0) return false;
+  return true;
+}
+
+/**
+ * Debugging helper: forces a fresh fetch and returns a Reddit pipeline audit report.
+ * Intended for short-lived tuning, not for end-user usage.
+ */
+export async function enrichEntryContextDebug(
+  entry: Entry,
+  _supabase: SupabaseClient
+): Promise<{ entry: Entry; redditDebug: RedditTriviaDebugReport }> {
+  // Force refresh for debugging.
+  const seedEntry = isSeedEntryId(entry.id);
+
+  let triviaItems: EntryTriviaItem[] = [];
+  let trivia: string | null = entry.trivia_summary;
+  let renditions: EntryRendition[] = entry.renditions ?? [];
+
+  const { items: redditItems, debug: redditDebug } = await fetchRedditTriviaItemsDebug(
+    entry.artist_name,
+    entry.song_name || entry.album_name
+  ).catch((e) => {
+    console.error("[entry-context-debug] reddit failed", e);
+    return {
+      items: [] as EntryTriviaItem[],
+      debug: {
+        enabled: false,
+        searchResultsCount: 0,
+        postsConsideredCount: 0,
+        postsDroppedReasons: {},
+        seedPostsCount: 0,
+        threadsFetchedTotal: 0,
+        commentsFetchedTotal: 0,
+        utterancesCount: 0,
+        categoryUtteranceMatches: {
+          similar: 0,
+          sonic: 0,
+          emotional: 0,
+          hidden: 0,
+          debate: 0,
+          stories: 0,
+        },
+        categoryItemsCreated: {
+          similar: 0,
+          sonic: 0,
+          emotional: 0,
+          hidden: 0,
+          debate: 0,
+          stories: 0,
+        },
+        extractedItemsCount: 0,
+        usedFallback: false,
+        persistedTriviaItemsCount: 0,
+        finalItemsPreview: [],
+      } as RedditTriviaDebugReport,
+    };
+  });
+
+  triviaItems = redditItems;
+
+  let lastFmText: string | null = null;
+  if (isLastFmConfigured()) {
+    try {
+      lastFmText = await fetchLastFmTrackWikiSummary(
+        entry.artist_name,
+        entry.song_name || entry.album_name
+      );
+      const trimmed = lastFmText?.trim() ?? "";
+      if (trimmed.length > 0) {
+        const existing = new Set(triviaItems.map((item) => item.text.trim().toLowerCase()));
+        if (!existing.has(trimmed.toLowerCase())) {
+          triviaItems.push({
+            text: trimmed,
+            source_type: "lastfm",
+            source_url: null,
+            score: null,
+            fetched_at: new Date().toISOString(),
+          });
+        }
+      }
+    } catch (e) {
+      console.warn("[entry-context-debug] lastfm failed", e);
+    }
+  }
+
+  try {
+    const wikiItems = await fetchWikiTriviaItems(
+      entry.artist_name,
+      entry.song_name || entry.album_name
+    );
+    if (wikiItems.length > 0) {
+      const existing = new Set(triviaItems.map((item) => item.text.trim().toLowerCase()));
+      for (const item of wikiItems) {
+        const key = item.text.trim().toLowerCase();
+        if (existing.has(key)) continue;
+        triviaItems.push(item);
+        existing.add(key);
+      }
+    }
+  } catch (e) {
+    console.warn("[entry-context-debug] wiki failed", e);
+  }
+
+  trivia =
+    triviaItems.find((i) => i.source_type === "reddit")?.text?.trim() ??
+    lastFmText?.trim() ??
+    triviaItems[0]?.text?.trim() ??
+    null;
+
+  // How many trivia items would survive the `mapEntryRow` validation layer.
+  const persistedTriviaItemsCount = triviaItems.filter(isPersistableTriviaItem).length;
+  redditDebug.persistedTriviaItemsCount = persistedTriviaItemsCount;
+
+  const fetchedAt = new Date().toISOString();
+
+  if (isSpotifyConfigured()) {
+    renditions = await fetchRenditionsForEntry(
+      entry.song_name || entry.album_name,
+      entry.artist_name,
+      entry.spotify_id,
+      5
+    );
+  }
+
+  const nextEntry: Entry = {
+    ...entry,
+    trivia_summary: trivia,
+    trivia_items: triviaItems,
+    renditions,
+    context_fetched_at: fetchedAt,
+  };
+
+  // In debug mode we do not persist; the UI reads the returned in-memory values.
+  if (seedEntry) return { entry: nextEntry, redditDebug };
+  return { entry: nextEntry, redditDebug };
 }

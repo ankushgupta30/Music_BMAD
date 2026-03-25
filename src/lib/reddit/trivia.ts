@@ -33,7 +33,7 @@ type ThreadUtterance = {
   isComment: boolean;
 };
 
-type RabbitCategory =
+export type RabbitCategory =
   | "similar"
   | "sonic"
   | "emotional"
@@ -93,6 +93,23 @@ const CATEGORY_SPECS: CategorySpec[] = [
   },
 ];
 
+export type RedditTriviaDebugReport = {
+  enabled: boolean;
+  searchResultsCount: number;
+  postsConsideredCount: number;
+  postsDroppedReasons: Record<string, number>;
+  seedPostsCount: number;
+  threadsFetchedTotal: number;
+  commentsFetchedTotal: number;
+  utterancesCount: number;
+  categoryUtteranceMatches: Record<RabbitCategory, number>;
+  categoryItemsCreated: Record<RabbitCategory, number>;
+  extractedItemsCount: number;
+  usedFallback: boolean;
+  persistedTriviaItemsCount: number;
+  finalItemsPreview: string[];
+};
+
 const DISCUSSION_RE =
   /\b(thoughts?|opinion|feel|discussion|interpretation|meaning|favorite|favourite|personally|honestly|unpopular|hot take|anyone else|why i love|first time i|reminds me|essay|deep dive|reference(s)? behind|breakdown|analysis)\b/i;
 
@@ -149,6 +166,135 @@ function quoteSnippet(text: string): string {
         ? firstSentences(plain, 2, SNIPPET_MAX)
         : plain.slice(0, SNIPPET_MAX);
   return chosen.trim();
+}
+
+function windowAroundMatch(raw: string, rx: RegExp, maxLen: number): string {
+  const text = cleanText(raw);
+  try {
+    const m = rx.exec(text);
+    if (m && typeof m.index === "number") {
+      const start = Math.max(0, m.index - 70);
+      const end = Math.min(text.length, m.index + m[0].length + (maxLen - 80));
+      return text.slice(start, end).trim();
+    }
+  } catch {
+    // ignore
+  }
+  return text.slice(0, maxLen).trim();
+}
+
+function extractEntitiesForCategory(raw: string, category: RabbitCategory): string[] {
+  const text = cleanText(raw);
+  const addUnique = (arr: string[], v: string) => {
+    const cleaned = v.trim().replace(/^["'`]+|["'`]+$/g, "");
+    if (!cleaned) return arr;
+    if (arr.includes(cleaned)) return arr;
+    arr.push(cleaned);
+    return arr;
+  };
+
+  const out: string[] = [];
+  let m: RegExpMatchArray | null = null;
+
+  switch (category) {
+    case "similar": {
+      m = text.match(
+        /\b(sounds like|reminds me of|similar to|same vibe|same era|same producer|in the lane of)\b[^A-Za-z0-9]{0,15}([^.!?]{3,80})/i
+      );
+      if (m?.[2]) {
+        const parts = m[2].split(/,| and | & /i).map((s) => s.trim());
+        for (const p of parts) {
+          if (!p) continue;
+          if (p.length < 3) continue;
+          addUnique(out, p.slice(0, 46));
+          if (out.length >= 3) break;
+        }
+      }
+      break;
+    }
+    case "sonic": {
+      const producerMatch = text.match(
+        /\b(produced by|producer)\b[^A-Za-z0-9]{0,10}([^.!?]{2,70})/i
+      );
+      const sampleMatch = text.match(
+        /\b(sampled?|sample|interpolation)\b[^A-Za-z0-9]{0,10}([^.!?]{2,70})/i
+      );
+      if (producerMatch?.[2]) addUnique(out, producerMatch[2].slice(0, 46));
+      if (sampleMatch?.[2]) addUnique(out, sampleMatch[2].slice(0, 46));
+      const instrumentHints: Array<[string, string]> = [
+        ["808", "808"],
+        ["synth", "synth"],
+        ["guitar", "guitar"],
+        ["strings", "strings"],
+        ["piano", "piano"],
+        ["drum", "drums"],
+        ["reverb", "reverb"],
+        ["distortion", "distortion"],
+      ];
+      for (const [needle, token] of instrumentHints) {
+        if (out.length >= 3) break;
+        if (new RegExp(`\\b${needle}\\b`, "i").test(text)) addUnique(out, token);
+      }
+      break;
+    }
+    case "emotional": {
+      m = text.match(
+        /\b(feels like|makes me feel|hits different|haunting|nostalgia|intimate|cathartic)\b([^.!?]{3,90})/i
+      );
+      if (m?.[2]) {
+        const phrase = m[2].trim().split(/,|;|\s{2,}/)[0].trim();
+        if (phrase) addUnique(out, phrase.split(" ").slice(0, 6).join(" "));
+      }
+      break;
+    }
+    case "hidden": {
+      m = text.match(
+        /\b(underrated|slept on|deep cut|nobody talks about|rarely mentioned|hidden gem|criminally ignored|buried)\b[^A-Za-z0-9]{0,10}([^.!?]{2,70})/i
+      );
+      if (m?.[2]) {
+        const parts = m[2].split(/,| and | & /i).map((s) => s.trim());
+        for (const p of parts) {
+          if (!p) continue;
+          addUnique(out, p.slice(0, 46));
+          if (out.length >= 2) break;
+        }
+      }
+      break;
+    }
+    case "debate": {
+      m = text.match(
+        /\b(overrated|underrated|skip|no skip|hot take|unpopular opinion)\b[^A-Za-z0-9]{0,10}([^.!?]{2,70})/i
+      );
+      if (m?.[2]) {
+        addUnique(out, m[2].slice(0, 46));
+      }
+      break;
+    }
+    case "stories": {
+      m = text.match(
+        /\b(first time i heard|when i|in the car|during college|after my breakup|at my wedding|at my funeral|got me through|helped me|saved me)\b([^.!?]{0,90})/i
+      );
+      if (m) {
+        const trigger = m[1]?.trim();
+        const tail = (m[2] ?? "").trim();
+        if (trigger) addUnique(out, trigger);
+        if (tail) {
+          const t2 = tail.split(/[,.]/)[0].trim();
+          if (t2) addUnique(out, t2.slice(0, 40));
+        }
+      }
+      break;
+    }
+  }
+
+  return out.slice(0, 3);
+}
+
+function buildWhySnippet(raw: string, category: RabbitCategory): string {
+  const text = cleanText(raw);
+  const spec = CATEGORY_SPECS.find((s) => s.key === category);
+  if (!spec) return text.slice(0, 90);
+  return windowAroundMatch(text, spec.regex, 140);
 }
 
 function toSourceUrl(permalink: string): string | null {
@@ -244,9 +390,23 @@ function createUtterances(post: SearchPost, comments: Array<{ body: string; ups:
   return out;
 }
 
-function buildCategoryItems(utterances: ThreadUtterance[], nowIso: string): EntryTriviaItem[] {
+function buildCategoryItemsWithDebug(
+  utterances: ThreadUtterance[],
+  nowIso: string
+): {
+  items: EntryTriviaItem[];
+  categoryUtteranceMatches: Record<RabbitCategory, number>;
+  categoryItemsCreated: Record<RabbitCategory, number>;
+  extractedItemsCount: number;
+} {
   const resultsByCategory = new Map<RabbitCategory, EntryTriviaItem[]>();
   const globalSeen = new Set<string>();
+  const categoryUtteranceMatches = {} as Record<RabbitCategory, number>;
+  const categoryItemsCreated = {} as Record<RabbitCategory, number>;
+  for (const spec of CATEGORY_SPECS) {
+    categoryUtteranceMatches[spec.key] = 0;
+    categoryItemsCreated[spec.key] = 0;
+  }
 
   for (const utterance of utterances) {
     const raw = utterance.text;
@@ -255,9 +415,12 @@ function buildCategoryItems(utterances: ThreadUtterance[], nowIso: string): Entr
 
     for (const category of CATEGORY_SPECS) {
       if (!category.regex.test(raw)) continue;
+      categoryUtteranceMatches[category.key] += 1;
+
       const dedupeKey = `${category.key}:${normalize(snippet).slice(0, 150)}`;
       if (globalSeen.has(dedupeKey)) continue;
       globalSeen.add(dedupeKey);
+      categoryItemsCreated[category.key] += 1;
 
       let score = utterance.threadBaseScore + category.bonus;
       score += Math.log10(Math.max(1, utterance.commentUps + 1)) * 8;
@@ -266,7 +429,14 @@ function buildCategoryItems(utterances: ThreadUtterance[], nowIso: string): Entr
       if (/\b(i|i'm|i've|my|me|we)\b/i.test(raw)) score += 10;
       if (raw.length >= 260) score += 8;
 
-      const text = `${category.label} · r/${utterance.subreddit}: "${snippet}"`;
+      const entities = extractEntitiesForCategory(raw, category.key);
+      const why = buildWhySnippet(raw, category.key);
+      const entityPart = entities.length ? ` · [${entities.join(", ")}]` : "";
+      const whyPart = why ? ` — ${why}` : "";
+      const label = category.key === "hidden" ? `Hidden gem:` : category.label;
+      const fullText = `${label} · r/${utterance.subreddit}: "${snippet}"${entityPart}${whyPart}`;
+      const text =
+        fullText.length > 560 ? `${fullText.slice(0, 560).trim()}...` : fullText;
       const item: EntryTriviaItem = {
         text,
         source_type: "reddit",
@@ -290,21 +460,77 @@ function buildCategoryItems(utterances: ThreadUtterance[], nowIso: string): Entr
     if (spec.key === "hidden" && candidates[1]) ordered.push(candidates[1]);
   }
 
-  return ordered.slice(0, MAX_ITEMS);
+  const extractedItemsCount = Object.values(categoryItemsCreated).reduce(
+    (a, b) => a + b,
+    0
+  );
+
+  return {
+    items: ordered.slice(0, MAX_ITEMS),
+    categoryUtteranceMatches,
+    categoryItemsCreated,
+    extractedItemsCount,
+  };
 }
 
 export function isRedditTriviaEnabled(): boolean {
   return process.env.REDDIT_TRIVIA_ENABLED?.trim() === "1";
 }
 
-export async function fetchRedditTriviaItems(artist: string, song: string): Promise<EntryTriviaItem[]> {
-  if (!isRedditTriviaEnabled()) return [];
+export async function fetchRedditTriviaItems(
+  artist: string,
+  song: string
+): Promise<EntryTriviaItem[]> {
+  const { items } = await fetchRedditTriviaItemsInternal(artist, song, false);
+  return items;
+}
+
+export async function fetchRedditTriviaItemsDebug(
+  artist: string,
+  song: string
+): Promise<{ items: EntryTriviaItem[]; debug: RedditTriviaDebugReport }> {
+  return fetchRedditTriviaItemsInternal(artist, song, true);
+}
+
+async function fetchRedditTriviaItemsInternal(
+  artist: string,
+  song: string,
+  debugEnabled: boolean
+): Promise<{ items: EntryTriviaItem[]; debug: RedditTriviaDebugReport }> {
+  const emptyCategoryCounts = () =>
+    ({
+      similar: 0,
+      sonic: 0,
+      emotional: 0,
+      hidden: 0,
+      debate: 0,
+      stories: 0,
+    }) as Record<RabbitCategory, number>;
+
+  const debug: RedditTriviaDebugReport = {
+    enabled: debugEnabled,
+    searchResultsCount: 0,
+    postsConsideredCount: 0,
+    postsDroppedReasons: {},
+    seedPostsCount: 0,
+    threadsFetchedTotal: 0,
+    commentsFetchedTotal: 0,
+    utterancesCount: 0,
+    categoryUtteranceMatches: emptyCategoryCounts(),
+    categoryItemsCreated: emptyCategoryCounts(),
+    extractedItemsCount: 0,
+    usedFallback: false,
+    persistedTriviaItemsCount: 0,
+    finalItemsPreview: [],
+  };
+
+  if (!isRedditTriviaEnabled()) return { items: [], debug: { ...debug, enabled: false } };
   const artistName = artist.trim();
   const songName = song.trim();
-  if (!artistName || !songName) return [];
+  if (!artistName || !songName) return { items: [], debug: { ...debug, enabled: false } };
 
   const query = [
-    `"${artistName}" "${songName}"`,
+    `${artistName} ${songName}`,
     "(",
     [
       "discussion",
@@ -338,7 +564,7 @@ export async function fetchRedditTriviaItems(artist: string, song: string): Prom
 
   if (!res.ok) {
     console.warn("[reddit] search failed", res.status);
-    return [];
+    return { items: [], debug };
   }
 
   const data = (await res.json()) as {
@@ -357,6 +583,12 @@ export async function fetchRedditTriviaItems(artist: string, song: string): Prom
     };
   };
 
+  debug.searchResultsCount = data.data?.children?.length ?? 0;
+
+  const incDropped = (reason: string) => {
+    debug.postsDroppedReasons[reason] = (debug.postsDroppedReasons[reason] ?? 0) + 1;
+  };
+
   const artistTokens = tokenize(artistName);
   const songTokens = tokenize(songName);
   const requiredTokens = Array.from(new Set([...artistTokens, ...songTokens]));
@@ -364,24 +596,42 @@ export async function fetchRedditTriviaItems(artist: string, song: string): Prom
 
   for (const child of data.data?.children ?? []) {
     const p = child.data;
-    if (!p) continue;
+    if (!p) {
+      incDropped("missing_child_data");
+      continue;
+    }
     const title = (p.title || "").trim();
     const selftext = (p.selftext || "").trim();
     const subreddit = normalize(p.subreddit || "");
     const permalink = (p.permalink || "").trim();
     const id = (p.id || "").trim();
-    if (!title || !id || !permalink) continue;
-    if (SUBREDDIT_ALLOWLIST.size > 0 && !SUBREDDIT_ALLOWLIST.has(subreddit)) continue;
-    if (looksPromoOnly(title, selftext)) continue;
+    if (!title || !id || !permalink) {
+      incDropped("missing_fields");
+      continue;
+    }
+    if (SUBREDDIT_ALLOWLIST.size > 0 && !SUBREDDIT_ALLOWLIST.has(subreddit)) {
+      incDropped("subreddit_filtered");
+      continue;
+    }
+    if (looksPromoOnly(title, selftext)) {
+      incDropped("promo_only");
+      continue;
+    }
 
     const combined = `${title} ${selftext}`.trim();
     const tokenHits = countTokenHits(combined, requiredTokens);
-    if (tokenHits < Math.min(1, requiredTokens.length)) continue;
+    if (tokenHits < Math.min(1, requiredTokens.length)) {
+      incDropped("token_gate");
+      continue;
+    }
 
     const ups = typeof p.ups === "number" ? p.ups : 0;
     const comments = typeof p.num_comments === "number" ? p.num_comments : 0;
     const baseScore = tokenHits * 8 + threadBaseScore(combined, ups, comments);
-    if (comments < 2 && cleanText(selftext).length < 40) continue;
+    if (comments < 1 && cleanText(selftext).length < 30) {
+      incDropped("low_comment_or_short_selftext");
+      continue;
+    }
 
     posts.push({
       id,
@@ -393,27 +643,84 @@ export async function fetchRedditTriviaItems(artist: string, song: string): Prom
       permalink,
       baseScore,
     });
+    debug.postsConsideredCount += 1;
   }
 
   posts.sort((a, b) => b.baseScore - a.baseScore);
   const seedPosts = posts.slice(0, MAX_THREADS_FOR_COMMENTS);
+  debug.seedPostsCount = seedPosts.length;
   const nowIso = new Date().toISOString();
 
   const utterances: ThreadUtterance[] = [];
+  let commentsFetchedTotal = 0;
   for (const post of seedPosts) {
     const comments = await fetchThreadComments(post.permalink);
+    commentsFetchedTotal += comments.length;
     utterances.push(...createUtterances(post, comments));
   }
+  debug.threadsFetchedTotal = seedPosts.length;
+  debug.commentsFetchedTotal = commentsFetchedTotal;
+  debug.utterancesCount = utterances.length;
 
-  const items = buildCategoryItems(utterances, nowIso);
-  if (items.length > 0) return items;
+  const { items: categoryItems, categoryUtteranceMatches, categoryItemsCreated, extractedItemsCount } =
+    buildCategoryItemsWithDebug(utterances, nowIso);
+  debug.categoryUtteranceMatches = categoryUtteranceMatches;
+  debug.categoryItemsCreated = categoryItemsCreated;
+  debug.extractedItemsCount = extractedItemsCount;
 
-  // Fallback if category extraction misses everything.
-  return seedPosts.slice(0, 3).map((post) => ({
-    text: `Discussion · r/${post.subreddit}: "${quoteSnippet(post.selftext || post.title)}"`,
+  if (categoryItems.length > 0) {
+    debug.usedFallback = false;
+    debug.finalItemsPreview = categoryItems.slice(0, 3).map((i) => i.text);
+    debug.persistedTriviaItemsCount = categoryItems.filter(
+      (i) =>
+        typeof i.text === "string" &&
+        i.text.trim().length > 0 &&
+        i.source_type === "reddit" &&
+        typeof i.fetched_at === "string" &&
+        i.fetched_at.trim().length > 0
+    ).length;
+    return { items: categoryItems, debug };
+  }
+
+  debug.usedFallback = true;
+  // Category extraction sometimes misses even when we have utterances; in that
+  // case, surface the strongest raw listener utterances so the UI doesn't
+  // degrade into “still digging”.
+  const rankedUtterances = [...utterances].sort((a, b) => {
+    const aScore =
+      a.threadBaseScore +
+      (a.isComment ? 50 : 10) +
+      Math.log10(Math.max(1, a.commentUps + 1)) * 20;
+    const bScore =
+      b.threadBaseScore +
+      (b.isComment ? 50 : 10) +
+      Math.log10(Math.max(1, b.commentUps + 1)) * 20;
+    return bScore - aScore;
+  });
+
+  const fallbackUtterances = rankedUtterances.slice(0, 3);
+  const fallbackItems: EntryTriviaItem[] = fallbackUtterances.map((u) => ({
+    text: `Listener take · r/${u.subreddit}: "${quoteSnippet(u.text)}"`,
     source_type: "reddit",
-    source_url: toSourceUrl(post.permalink),
-    score: Number(post.baseScore.toFixed(2)),
+    source_url: toSourceUrl(u.permalink),
+    score: Number(
+      (
+        u.threadBaseScore +
+        (u.isComment ? 50 : 10) +
+        Math.log10(Math.max(1, u.commentUps + 1)) * 20
+      ).toFixed(2)
+    ),
     fetched_at: nowIso,
   }));
+
+  debug.finalItemsPreview = fallbackItems.slice(0, 3).map((i) => i.text);
+  debug.persistedTriviaItemsCount = fallbackItems.filter(
+    (i) =>
+      typeof i.text === "string" &&
+      i.text.trim().length > 0 &&
+      i.source_type === "reddit" &&
+      typeof i.fetched_at === "string" &&
+      i.fetched_at.trim().length > 0
+  ).length;
+  return { items: fallbackItems, debug };
 }

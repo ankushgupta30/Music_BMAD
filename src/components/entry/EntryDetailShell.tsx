@@ -97,6 +97,11 @@ export default function EntryDetailShell({
   const displayTrivia = rankedTrivia.slice(0, MAX_TRIVIA_BLOCKS);
   const redditItems = displayTrivia.filter((i) => i.source_type === "reddit");
   const topSubreddit = extractSubreddit(redditItems[0]?.text ?? "");
+  const nonRedditItems = displayTrivia.filter((i) => i.source_type !== "reddit");
+  const topReferenceItem = nonRedditItems[0] ?? null;
+  const topReferenceSource = topReferenceItem
+    ? sourceLabel(topReferenceItem.source_type)
+    : null;
   const fallbackTrivia =
     entry.trivia_summary && entry.trivia_summary.trim().length > 0
       ? entry.trivia_summary
@@ -172,7 +177,9 @@ export default function EntryDetailShell({
                 <p className={styles.postItMetaLine}>
                   {redditItems.length > 0
                     ? `${redditItems.length} thread note${redditItems.length > 1 ? "s" : ""}${topSubreddit ? ` · r/${topSubreddit}` : ""}`
-                    : "still digging for listener takes"}
+                    : topReferenceSource
+                      ? `No listener threads yet; showing ${topReferenceSource}`
+                      : "still digging for listener takes"}
                 </p>
               </div>
               {showStructured ? (
