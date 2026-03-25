@@ -35,56 +35,69 @@ export async function enrichEntryContext(
   let renditions: EntryRendition[] = entry.renditions ?? [];
 
   try {
-    if (isLastFmConfigured()) {
-      trivia = await fetchLastFmTrackWikiSummary(
+    const nextItems: EntryTriviaItem[] = [];
+    let lastFmText: string | null = null;
+
+    try {
+      const redditItems = await fetchRedditTriviaItems(
         entry.artist_name,
         entry.song_name || entry.album_name
       );
-      if (trivia && trivia.trim().length > 0) {
-        triviaItems = [
-          {
-            text: trivia,
-            source_type: "lastfm",
-            source_url: null,
-            score: null,
-            fetched_at: new Date().toISOString(),
-          },
-        ];
+      nextItems.push(...redditItems);
+    } catch (e) {
+      console.warn("[entry-context] reddit failed", e);
+    }
+
+    if (isLastFmConfigured()) {
+      try {
+        lastFmText = await fetchLastFmTrackWikiSummary(
+          entry.artist_name,
+          entry.song_name || entry.album_name
+        );
+        const trimmed = lastFmText?.trim() ?? "";
+        if (trimmed.length > 0) {
+          const existing = new Set(nextItems.map((item) => item.text.trim().toLowerCase()));
+          const key = trimmed.toLowerCase();
+          if (!existing.has(key)) {
+            nextItems.push({
+              text: trimmed,
+              source_type: "lastfm",
+              source_url: null,
+              score: null,
+              fetched_at: new Date().toISOString(),
+            });
+          }
+        }
+      } catch (e) {
+        console.warn("[entry-context] lastfm failed", e);
       }
     }
 
-    const redditItems = await fetchRedditTriviaItems(
-      entry.artist_name,
-      entry.song_name || entry.album_name
-    );
-    if (redditItems.length > 0) {
-      const existing = new Set(triviaItems.map((item) => item.text.trim().toLowerCase()));
-      for (const item of redditItems) {
-        const key = item.text.trim().toLowerCase();
-        if (existing.has(key)) continue;
-        triviaItems.push(item);
-        existing.add(key);
+    try {
+      const wikiItems = await fetchWikiTriviaItems(
+        entry.artist_name,
+        entry.song_name || entry.album_name
+      );
+      if (wikiItems.length > 0) {
+        const existing = new Set(nextItems.map((item) => item.text.trim().toLowerCase()));
+        for (const item of wikiItems) {
+          const key = item.text.trim().toLowerCase();
+          if (existing.has(key)) continue;
+          nextItems.push(item);
+          existing.add(key);
+        }
       }
+    } catch (e) {
+      console.warn("[entry-context] wiki failed", e);
     }
 
-    const wikiItems = await fetchWikiTriviaItems(
-      entry.artist_name,
-      entry.song_name || entry.album_name
-    );
-    if (wikiItems.length > 0) {
-      const existing = new Set(triviaItems.map((item) => item.text.trim().toLowerCase()));
-      for (const item of wikiItems) {
-        const key = item.text.trim().toLowerCase();
-        if (existing.has(key)) continue;
-        triviaItems.push(item);
-        existing.add(key);
-      }
-    }
-
-    // Keep legacy UI populated while structured trivia rolls out.
-    if ((!trivia || trivia.trim().length === 0) && triviaItems.length > 0) {
-      trivia = triviaItems[0]?.text ?? null;
-    }
+    triviaItems = nextItems;
+    // Legacy single field: prefer a discussion snippet, else first reference line.
+    trivia =
+      triviaItems.find((i) => i.source_type === "reddit")?.text?.trim()
+      ?? lastFmText?.trim()
+      ?? triviaItems[0]?.text?.trim()
+      ?? null;
 
     if (isSpotifyConfigured()) {
       renditions = await fetchRenditionsForEntry(

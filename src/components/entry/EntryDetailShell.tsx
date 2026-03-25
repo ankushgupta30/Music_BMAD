@@ -28,22 +28,27 @@ interface EntryDetailShellProps {
 
 const MAX_TRIVIA_BLOCKS = 6;
 
-/** Order: Last.fm lead, then Reddit by score, then Wiki, then other. */
+/**
+ * Order: Reddit (discussion) first, using per-item score for ties;
+ * encyclopedic sources after.
+ */
 function triviaRankScore(item: Entry["trivia_items"][number]): number {
-  if (item.score != null) return item.score;
-  if (item.source_type === "lastfm") return 1_000_000;
-  if (item.source_type === "wiki") return 500_000;
-  return 0;
+  if (item.source_type === "reddit") {
+    return 2_000_000 + (item.score ?? 0);
+  }
+  if (item.source_type === "lastfm") return 100_000;
+  if (item.source_type === "wiki") return 50_000;
+  return (item.score ?? 0) + 1;
 }
 
 function sourceLabel(kind: Entry["trivia_items"][number]["source_type"]): string {
   switch (kind) {
     case "lastfm":
-      return "Last.fm";
+      return "Reference · Last.fm";
     case "reddit":
-      return "Reddit";
+      return "Discussion · Reddit";
     case "wiki":
-      return "Wiki";
+      return "Reference · Wikipedia";
     case "interview":
       return "Interview";
     case "editorial":
@@ -168,7 +173,9 @@ export default function EntryDetailShell({
                 ) : showLegacyFallback ? (
                   <p className={styles.triviaHand}>{fallbackTrivia}</p>
                 ) : (
-                  <p className={styles.hintText}>No public write-up found for this track yet.</p>
+                  <p className={styles.hintText}>
+                    No discussion threads or listener notes surfaced for this track yet.
+                  </p>
                 )}
               </div>
             </div>
